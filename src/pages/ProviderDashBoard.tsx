@@ -5,9 +5,7 @@ import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import { useNavigate } from "react-router";
 
-const PROVIDER_DASHBOARD = import.meta.env.VITE_PROVIDER_DASHBOARD_URL;
-const COINS_URL = import.meta.env.VITE_COINS_URL;
-const BUY_CUSTOMER_CONTACT = import.meta.env.VITE_BUY_CUSTOMER_CONTACT;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 interface ContactedRequest {
   requestId: string;
@@ -40,7 +38,7 @@ const ProviderDashBoard = () => {
   useEffect(() => {
     if (!accessToken) return;
 
-    fetch(COINS_URL, {
+    fetch(`${BACKEND_URL}/coins`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +57,7 @@ const ProviderDashBoard = () => {
 
   useEffect(() => {
     let currentToken = token;
-    fetch(PROVIDER_DASHBOARD, {
+    fetch(`${BACKEND_URL}/providers/providerDashBoard`, {
       method: "GET",
       headers: {
         "content-type": "application/json",
@@ -100,7 +98,7 @@ const ProviderDashBoard = () => {
     if (!selectedRequest) return;
 
     try {
-      const response = await fetch(BUY_CUSTOMER_CONTACT, {
+      const response = await fetch(`${BACKEND_URL}/providers/customerContact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

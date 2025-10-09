@@ -3,7 +3,7 @@ import type SignUpForm from "../interfaces/SignUpInterface";
 import { useDispatch } from "react-redux";
 import { signupAction } from "../redux/reducer/AuthReducer";
 import { useNavigate } from "react-router";
-const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 
@@ -21,7 +21,7 @@ const SignUp = () => {
   const handleSignUp = () => {
     console.log(users);
 
-    fetch(API_URL, {
+    fetch(`${BACKEND_URL}/users/signUp`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(users),

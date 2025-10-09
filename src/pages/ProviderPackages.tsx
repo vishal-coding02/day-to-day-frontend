@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import type { Package } from "../interfaces/ServicePackageInterface";
 import Footer from "../components/layout/Footer";
 import NavBar from "../components/layout/NavBar";
-const PROVIDERS_PACKAGES_URL = import.meta.env.VITE_PROVIDERS_PACKAGES_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ServicePackage = () => {
   const token = useSelector((state: any) => state.auth.jwtToken);
@@ -59,7 +59,7 @@ const ServicePackage = () => {
   };
 
   const handleCreatePackage = () => {
-    fetch(PROVIDERS_PACKAGES_URL, {
+    fetch(`${BACKEND_URL}/packages/addPackages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

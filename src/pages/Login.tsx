@@ -3,7 +3,7 @@ import type LoginForm from "../interfaces/LoginInterface";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { jwtTokenAction, loginAction } from "../redux/reducer/AuthReducer";
-const LOGIN_API_URL = import.meta.env.VITE_LOGIN_API_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 
@@ -77,7 +77,7 @@ const Login = () => {
 
     console.log("Sending login data:", requestData);
 
-    fetch(LOGIN_API_URL, {
+    fetch(`${BACKEND_URL}/users/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

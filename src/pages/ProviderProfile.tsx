@@ -6,11 +6,7 @@ import type { ServicePackage } from "../interfaces/ServicePackageInterface";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 
-const COINS_URL = import.meta.env.VITE_COINS_URL;
-const PROVIDERS_PROFILE_URL = import.meta.env.VITE_PROVIDERS_PROFILE_URL;
-const MYPACKAGES_URL = import.meta.env.VITE_PROVIDERS_MYPACKAGES_URL;
-const PURCHASE_CONTACT_URL = import.meta.env.VITE_PURCHASE_CONTACT_URL;
-const UNLOCKED_CONTACT_URL = import.meta.env.VITE_UNLOCKED_CONTACT_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ProviderProfile = () => {
   const navigate = useNavigate();
@@ -32,7 +28,7 @@ const ProviderProfile = () => {
   useEffect(() => {
     if (!accessToken) return;
 
-    fetch(COINS_URL, {
+    fetch(`${BACKEND_URL}/coins`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +49,7 @@ const ProviderProfile = () => {
     const fetchData = async () => {
       let currentToken = token;
       try {
-        const res = await fetch(`${PROVIDERS_PROFILE_URL}/${id}`, {
+        const res = await fetch(`${BACKEND_URL}/providers/profile/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -76,7 +72,7 @@ const ProviderProfile = () => {
     const fetchPackages = async () => {
       let currentToken = token;
       try {
-        const res = await fetch(`${MYPACKAGES_URL}/${id}`, {
+        const res = await fetch(`${BACKEND_URL}/packages/providerPackages/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -97,7 +93,7 @@ const ProviderProfile = () => {
 
   useEffect(() => {
     const checkUnlocked = async () => {
-      const res = await fetch(`${UNLOCKED_CONTACT_URL}/${id}`, {
+      const res = await fetch(`${BACKEND_URL}/hasUnlocked/${id}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token || accessToken}`,
@@ -112,7 +108,7 @@ const ProviderProfile = () => {
   // Function to handle contact purchase
   const handlePurchaseContact = async () => {
     try {
-      const response = await fetch(PURCHASE_CONTACT_URL, {
+      const response = await fetch(`${BACKEND_URL}/coins`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

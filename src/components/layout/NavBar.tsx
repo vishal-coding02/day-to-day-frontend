@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-const COINS_URL = import.meta.env.VITE_COINS_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const NavBar = () => {
   const userType = localStorage.getItem("userType");
@@ -18,7 +18,7 @@ const NavBar = () => {
   useEffect(() => {
     if (!accessToken) return;
 
-    fetch(COINS_URL, {
+    fetch(`${BACKEND_URL}/coins`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

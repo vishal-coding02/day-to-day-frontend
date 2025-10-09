@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-const VERIFY = import.meta.env.VITE_VERIFY_OTP_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const OTPVerification = () => {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const OTPVerification = () => {
     const otpValue = otp.join("");
     console.log("Sent OTP:", otpValue); // Check yeh value
     console.log("Sent OTP Type:", typeof otpValue); // Ensure string hai
-    fetch(VERIFY, {
+    fetch(`${BACKEND_URL}/verifyOtp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

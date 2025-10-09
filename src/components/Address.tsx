@@ -1,5 +1,5 @@
 import { useState } from "react";
-const ADDRESS_API_URL = import.meta.env.VITE_ADDRESS_API_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import type AddressForm from "../interfaces/AddressInterfaces";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
@@ -42,7 +42,7 @@ const AddressVerification = () => {
       return;
     }
 
-    fetch(ADDRESS_API_URL, {
+    fetch(`${BACKEND_URL}/users/address`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ id: userId, address: addressData }),

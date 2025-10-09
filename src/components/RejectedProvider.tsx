@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
-const FETCH_REJECT_PROVIDER = import.meta.env.VITE_FETCH_REJECT_PROVIDER;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const RejectedProvider = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const RejectedProvider = () => {
   useEffect(() => {
     let currentToken = token;
     setLoading(true);
-    fetch(`${FETCH_REJECT_PROVIDER}/${id}`, {
+    fetch(`${BACKEND_URL}/rejected/${id}`, {
       method: "GET",
       headers: {
         "content-type": "application/json",

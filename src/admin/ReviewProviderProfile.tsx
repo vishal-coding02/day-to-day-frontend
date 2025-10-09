@@ -3,8 +3,7 @@ import { useParams, useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import type ProviderInfoResponse from "../interfaces/AdminDashBord";
 
-const ADMIN_DASHBOARD_REVIEW_PROVIDER_URL = import.meta.env
-  .VITE_ADMIN_DASHBOARD_REVIEW_PROVIDER_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ReviewProviderProfile = () => {
   const { id } = useParams();
@@ -18,7 +17,7 @@ const ReviewProviderProfile = () => {
 
   useEffect(() => {
     let currentToken = token;
-    fetch(`${ADMIN_DASHBOARD_REVIEW_PROVIDER_URL}/${id}`, {
+    fetch(`${BACKEND_URL}/admin/reviewProviderProfile/${id}`, {
       method: "GET",
       headers: {
         "content-type": "application/json",

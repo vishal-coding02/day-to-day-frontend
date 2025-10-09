@@ -1,4 +1,4 @@
-const PPC_API_URL = import.meta.env.VITE_PPC_API_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import type ProviderProfileCreation from "../interfaces/PPCInterface";
@@ -132,7 +132,7 @@ const PPC = () => {
       console.error("User ID is undefined!");
       return;
     }
-    fetch(PPC_API_URL, {
+    fetch(`${BACKEND_URL}/providers/profileCreation`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

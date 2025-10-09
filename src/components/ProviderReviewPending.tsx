@@ -7,7 +7,7 @@ interface ReviewData {
   message: string;
 }
 
-const PROVIDER_REVIEW_URL = import.meta.env.VITE_PROVIDER_REVIEW_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ProviderReviewPending = () => {
   const { id } = useParams();
@@ -19,7 +19,7 @@ const ProviderReviewPending = () => {
 
   useEffect(() => {
     let currentToken = token;
-    fetch(`${PROVIDER_REVIEW_URL}/${id}`, {
+    fetch(`${BACKEND_URL}/providers/providerUnderReview/${id}`, {
       method: "GET",
       headers: {
         "content-type": "application/json",

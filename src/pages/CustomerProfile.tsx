@@ -5,7 +5,7 @@ import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import type CustomerProfile from "../interfaces/CustomerInterface";
 
-const CUSTOMER_PROFILE_URL = import.meta.env.VITE_CUSTOMER_PROFILE_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const CustomerProfilePage = () => {
   const token = useSelector((state: any) => state.auth.jwtToken);
@@ -21,7 +21,7 @@ const CustomerProfilePage = () => {
     const fetchData = async () => {
       let currentToken = token;
       try {
-        const res = await fetch(`${CUSTOMER_PROFILE_URL}/${id}`, {
+        const res = await fetch(`${BACKEND_URL}/customers/profile/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

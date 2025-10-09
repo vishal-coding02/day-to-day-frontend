@@ -3,7 +3,7 @@ import Footer from "../components/layout/Footer";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import type CustomerRequest from "../interfaces/CustomerRequestInterface";
-const CUSTOMER_REQUEST_URL = import.meta.env.VITE_CUSTOMER_REQUEST_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const CreateCustomerRequest = () => {
   const token = useSelector((state: any) => state.auth.jwtToken);
@@ -35,7 +35,7 @@ const CreateCustomerRequest = () => {
     e.preventDefault();
     console.log("Request :", request);
 
-    fetch(CUSTOMER_REQUEST_URL, {
+    fetch(`${BACKEND_URL}/customers/request`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

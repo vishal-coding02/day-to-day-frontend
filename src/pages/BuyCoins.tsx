@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
-const BUY_COINS_URL = import.meta.env.VITE_BUY_COINS_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const BuyCoins = () => {
   const token = useSelector((state: any) => state.auth.jwtToken);
@@ -68,7 +68,7 @@ const BuyCoins = () => {
     if (!selectedPkg) return;
 
     try {
-      const response = await fetch(BUY_COINS_URL, {
+      const response = await fetch(`${BACKEND_URL}/buyCoins`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

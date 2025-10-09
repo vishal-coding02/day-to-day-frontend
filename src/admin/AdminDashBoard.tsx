@@ -4,11 +4,7 @@ import { useNavigate } from "react-router";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 
-const ADMIN_DASHBIARD_URL = import.meta.env.VITE_ADMIN_DASHBOARD_URL;
-const ADMIN_DASHBOARD_AllUSERS_URL = import.meta.env
-  .VITE_ADMIN_DASHBOARD_AllUSERS_URL;
-const APPROVED_MAIL_URL = import.meta.env.VITE_APPROVED_MAIL_URL;
-const REJECT_PROVIDER_URL = import.meta.env.VITE_REJECT_PROVIDER_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -25,7 +21,7 @@ const AdminDashboard = () => {
     try {
       let currentToken = token || accessToken;
 
-      const res = await fetch(APPROVED_MAIL_URL, {
+      const res = await fetch(`${BACKEND_URL}/admin/approveProvider`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -62,7 +58,7 @@ const AdminDashboard = () => {
     try {
       let currentToken = token || accessToken;
 
-      const res = await fetch(REJECT_PROVIDER_URL, {
+      const res = await fetch(`${BACKEND_URL}/admin/rejectProvider`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -109,7 +105,7 @@ const AdminDashboard = () => {
 
   const fetchPendingProviders = () => {
     let currentToken = token;
-    fetch(ADMIN_DASHBIARD_URL, {
+    fetch(`${BACKEND_URL}/admin/pendingProviders`, {
       method: "GET",
       headers: {
         "content-type": "application/json",
@@ -138,7 +134,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     let currentToken = token;
-    fetch(ADMIN_DASHBOARD_AllUSERS_URL, {
+    fetch(`${BACKEND_URL}/admin/users`, {
       method: "GET",
       headers: {
         "content-type": "application/json",

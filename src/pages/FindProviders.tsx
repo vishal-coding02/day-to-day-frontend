@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
-const FIND_PROVIDERS_URL = import.meta.env.VITE_FIND_PROVIDERS_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import type ProviderProfileData from "../interfaces/ProviderProfileInterface";
 
 const FindProviders = () => {
@@ -36,7 +36,7 @@ const FindProviders = () => {
 
     navigate(`?${queryParams.toString()}`, { replace: true });
 
-    let url = `${FIND_PROVIDERS_URL}?${queryParams.toString()}`;
+    let url = `${BACKEND_URL}/customers/providers?${queryParams.toString()}`;
     fetch(url, {
       method: "GET",
       headers: {
