@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 
 const CustomerHomePage = () => {
-  const token = useSelector((state: any) => state.auth.jwtToken);
+  // const token = useSelector((state: any) => state.auth.jwtToken);
   const accessToken = localStorage.getItem("accessToken");
   const [activeCategory, setActiveCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
