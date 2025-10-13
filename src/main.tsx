@@ -22,6 +22,7 @@ import ServicePackage from "./pages/ProviderPackages.tsx";
 import BuyCoins from "./pages/BuyCoins.tsx";
 import CustomerProfile from "./pages/CustomerProfile.tsx";
 import RejectedProvider from "./components/RejectedProvider.tsx";
+import AboutUs from "./pages/AboutPage";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -95,6 +96,10 @@ const router = createBrowserRouter([
     path: "/rejectedProvider",
     element: <RejectedProvider />,
   },
+  {
+    path : "/about",
+    element : <AboutUs/>
+  }
 ]);
 
 createRoot(document.getElementById("root")!).render(
