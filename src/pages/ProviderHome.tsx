@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
 
 const ProviderHomePage = () => {
+  const navigate = useNavigate();
   const token = useSelector((state: any) => state.auth.jwtToken);
-  const accessToken = localStorage.getItem("accessToken");
+  const isAuthReady = useSelector((state: any) => state.auth.isAuthReady);
   const userID = localStorage.getItem("userID");
   const [userCoins, setUserCoins] = useState(0);
   const [activeRequests, setActiveRequests] = useState(0);
@@ -118,54 +120,38 @@ const ProviderHomePage = () => {
       description: "Work when you want and manage your own time",
     },
   ];
+  useEffect(() => {
+    const fetchCoins = async () => {
+      try {
+        const response = await api.get(`/coins`);
+        console.log("Coins :", response.data.userCoins);
+        setUserCoins(response.data.userCoins);
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
+      }
+    };
+    fetchCoins();
+  }, []);
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!isAuthReady) return;
 
-    fetch(`${BACKEND_URL}/coins`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token || accessToken}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Coins :", data.userCoins);
-        setUserCoins(data.userCoins);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-      });
-  }, [token]);
-
-  useEffect(() => {
-    // Check if user is logged in
-    if (!accessToken) {
-      window.location.href = "/login";
+    if (!token) {
+      navigate("/login");
       return;
     }
 
-    // Fetch provider stats
     fetchCoinsBalance();
     fetchProviderStats();
-  }, [accessToken]);
+  }, [isAuthReady, token]);
 
   const fetchCoinsBalance = async () => {
     try {
-      const COINS_URL = import.meta.env.VITE_COINS_URL;
-      const response = await fetch(COINS_URL, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token || accessToken}`,
-        },
-      });
-      const data = await response.json();
-      setUserCoins(data.userCoins || 0);
+      const res = await api.get("/coins");
+      setUserCoins(res.data.userCoins || 0);
       setIsLoading(false);
-    } catch (error) {
-      console.log("Error fetching coins:", error);
+    } catch (err: any) {
+      console.log("Error :", err.response?.data?.message || err.message);
       setIsLoading(false);
     }
   };

@@ -1,9 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import AuthInitializer from "./components/AuthInitializer.tsx";
 import "./index.css";
+import "./api/interceptors.js";
 import SignUp from "./pages/SignUp.tsx";
 import Login from "./pages/Login.tsx";
-import UserProfile from "./pages/UserProfile.tsx";
 import PPC from "./pages/ProviderProfileCreation.tsx";
 import Address from "./components/Address.tsx";
 import { Provider } from "react-redux";
@@ -39,10 +40,6 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
-  },
-  {
-    path: "/profile",
-    element: <UserProfile />,
   },
   {
     path: "/providerProfileCreation",
@@ -97,15 +94,17 @@ const router = createBrowserRouter([
     element: <RejectedProvider />,
   },
   {
-    path : "/about",
-    element : <AboutUs/>
-  }
+    path: "/about",
+    element: <AboutUs />,
+  },
 ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <AuthInitializer>
+        <RouterProvider router={router} />
+      </AuthInitializer>
     </Provider>
   </StrictMode>
 );

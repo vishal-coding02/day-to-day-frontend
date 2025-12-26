@@ -1,13 +1,10 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import type { Package } from "../interfaces/ServicePackageInterface";
 import Footer from "../components/layout/Footer";
 import NavBar from "../components/layout/NavBar";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
 
 const ServicePackage = () => {
-  const token = useSelector((state: any) => state.auth.jwtToken);
-  const accessToken = localStorage.getItem("accessToken");
   const userID = localStorage.getItem("userID");
   const [newPackage, setNewPackage] = useState<Package>({
     id: userID,
@@ -58,25 +55,19 @@ const ServicePackage = () => {
     }
   };
 
-  const handleCreatePackage = () => {
-    fetch(`${BACKEND_URL}/packages/addPackages`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token || accessToken}`,
-      },
-      body: JSON.stringify(newPackage),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Packages created :", data);
-        setNewPackage(data);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-      });
+  const handleCreatePackage = async (): Promise<void> => {
+    try {
+      const res = await api.post("/packages/addPackages", newPackage);
 
-    alert(`Package "${newPackage.title}" created successfully!`);
+      const data = res.data;
+
+      alert(`Package "${newPackage.title}" created successfully!`);
+      console.log("Packages created :", data);
+      setNewPackage(data);
+    } catch (err: any) {
+      console.log("Error :", err.response?.data?.message || err.message);
+    }
+
     // Reset form
     setNewPackage({
       id: "",

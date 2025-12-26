@@ -2,8 +2,11 @@ import { useState } from "react";
 import type LoginForm from "../interfaces/LoginInterface";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
-import { jwtTokenAction, loginAction } from "../redux/reducer/AuthReducer";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import {
+  jwtTokenAction,
+  loginAction,
+} from "../redux/reducer/AuthReducer";
+import api from "../api/axios.js";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 
@@ -64,12 +67,9 @@ const Login = () => {
     return !newErrors.phone && !newErrors.password && !newErrors.email;
   };
 
-  const handleLogin = () => {
-    if (!validateForm()) {
-      return;
-    }
+  const handleLogin = async () => {
+    if (!validateForm()) return;
 
-    // Prepare data to send based on login type
     const requestData = {
       password: loginData.password,
       [loginType]: loginData[loginType],
@@ -77,76 +77,53 @@ const Login = () => {
 
     console.log("Sending login data:", requestData);
 
-    fetch(`${BACKEND_URL}/users/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestData),
-    })
-      .then(async (res) => {
-        const data = await res.json();
+    try {
+      const res = await api.post("/users/login", requestData);
 
-        if (!res.ok) {
-          if (data.error) {
-            setErrors((prev) => ({
-              ...prev,
-              general: data.error,
-            }));
-          } else if (data.message) {
-            setErrors((prev) => ({
-              ...prev,
-              general: data.message,
-            }));
-          }
-          throw new Error(data.error || data.message || "Login failed");
-        }
+      const data = res.data;
+      console.log("Login success:", data);
 
-        console.log("Login success:", data);
+      dispatch(jwtTokenAction(data.accessToken));
+      dispatch(loginAction(data));
 
-        dispatch(jwtTokenAction(data.token));
+      localStorage.setItem("providerStatus", data.providerStatus);
+      localStorage.setItem("userID", data.userID);
+      localStorage.setItem("userType", data.userType);
 
-        localStorage.setItem("accessToken", data.token);
-        localStorage.setItem("providerStatus", data.providerStatus);
-        console.log("provider status", data.providerStatus);
-        localStorage.setItem("userID", data.userID);
-        localStorage.setItem("userType", data.userType);
-        console.log("userID", data.userID);
+      if (data.userType === "customer") {
+        navigate("/postRequirement");
+      } else if (
+        data.providerStatus === "pending" &&
+        data.userType === "provider"
+      ) {
+        navigate(`/providerReviews/${data.userID}`);
+      } else if (data.userType === "admin") {
+        navigate("/adminDashBoard");
+      } else if (
+        data.providerStatus === "reject" &&
+        data.userType === "provider"
+      ) {
+        navigate("/rejectedProvider");
+      } else if (
+        data.providerStatus === "approved" &&
+        data.userType === "provider"
+      ) {
+        navigate("/providerDashBoard");
+      }
 
-        dispatch(loginAction(data));
+      setErrors({ phone: "", password: "", email: "", general: "" });
+      setLoginData({ phone: "", password: "", email: "" });
+    } catch (err: any) {
+      console.log("Login error:", err);
 
-        if (data.userType === "customer") {
-          navigate("/postRequirement");
-        } else if (
-          data.providerStatus == "pending" &&
-          data.userType === "provider"
-        ) {
-          navigate(`/providerReviews/${data.userID}`);
-        } else if (data.userType === "admin") {
-          navigate("/adminDashBoard");
-        } else if (
-          data.providerStatus === "reject" &&
-          data.userType === "provider"
-        ) {
-          navigate("/rejectedProvider");
-        } else if (
-          data.providerStatus === "approve" &&
-          data.userType === "provider"
-        ) {
-          navigate("/providerDashBoard");
-        }
-        setErrors({ phone: "", password: "", email: "", general: "" });
-      })
-      .catch((err) => {
-        console.log("Error:", err.message);
-        setErrors((prev) => ({
-          ...prev,
-          general: err.message || "Something went wrong",
-        }));
-      });
-
-    // Reset Input
-    setLoginData({ phone: "", password: "", email: "" });
+      setErrors((prev) => ({
+        ...prev,
+        general:
+          err.response?.data?.error ||
+          err.response?.data?.message ||
+          "Login failed",
+      }));
+    }
   };
 
   return (
@@ -351,12 +328,12 @@ const Login = () => {
 
             <div className="mt-6 text-center text-sm text-gray-600">
               Don't have an account?{" "}
-              <a
-                href="#"
-                className="font-medium text-blue-600 hover:text-blue-500"
+              <span
+                onClick={() => navigate("/signup")}
+                className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
               >
                 Sign up
-              </a>
+              </span>
             </div>
           </div>
         </div>

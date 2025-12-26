@@ -1,8 +1,12 @@
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
 import { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import type ProviderProfileCreation from "../interfaces/PPCInterface";
 import { useNavigate } from "react-router";
+
+interface ProviderProfileResponse {
+  message?: string;
+}
 
 const PPC = () => {
   const navigate = useNavigate();
@@ -125,30 +129,31 @@ const PPC = () => {
     setStep(step - 1);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
+
     console.log("Form submitted:", formData);
+
     if (!userId) {
       console.error("User ID is undefined!");
       return;
     }
-    fetch(`${BACKEND_URL}/providers/profileCreation`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        console.log("profile created", data);
-        navigate("/login");
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-      });
+
+    try {
+      const res = await api.post<ProviderProfileResponse>(
+        "/providers/profileCreation",
+        {
+          ...formData,
+        }
+      );
+
+      console.log("Profile created:", res.data);
+      navigate("/login");
+    } catch (err: any) {
+      console.log("Error :", err.response?.data?.message || err.message);
+    }
   };
 
   // Services options

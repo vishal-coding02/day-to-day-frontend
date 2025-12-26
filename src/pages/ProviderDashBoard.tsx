@@ -4,8 +4,7 @@ import type Request from "../interfaces/ProviderDashBoard";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import { useNavigate } from "react-router";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
 
 interface ContactedRequest {
   requestId: string;
@@ -14,7 +13,6 @@ interface ContactedRequest {
 
 const ProviderDashBoard = () => {
   const navigate = useNavigate();
-  const accessToken = localStorage.getItem("accessToken");
   const token = useSelector((state: any) => state.auth.jwtToken);
   const [userCoins, setUserCoins] = useState(0);
   const [requests, setRequests] = useState<Request[]>([]);
@@ -36,50 +34,36 @@ const ProviderDashBoard = () => {
   }, []);
 
   useEffect(() => {
-    if (!accessToken) return;
-
-    fetch(`${BACKEND_URL}/coins`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token || accessToken}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Coins :", data.userCoins);
-        setUserCoins(data.userCoins);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-      });
-  }, [token, accessToken]);
+    const fetchCoins = async () => {
+      try {
+        const response = await api.get(`/coins`);
+        console.log("Coins :", response.data.userCoins);
+        setUserCoins(response.data.userCoins);
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
+      }
+    };
+    fetchCoins();
+  }, [token]);
 
   useEffect(() => {
-    let currentToken = token;
-    fetch(`${BACKEND_URL}/providers/providerDashBoard`, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${currentToken || accessToken}`,
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("All Customers Requests", data);
-        if (data.requests && Array.isArray(data.requests)) {
-          setRequests(data.requests);
+    const fetchProviderDashboard = async () => {
+      try {
+        const response = await api.get("/providers/providerDashBoard");
+        console.log("All Customers Requests", response.data);
+        if (response.data.requests && Array.isArray(response.data.requests)) {
+          setRequests(response.data.requests);
         } else {
           setRequests([]);
         }
         setLoading(false);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
         setLoading(false);
-      });
-  }, [token, accessToken]);
+      }
+    };
+    fetchProviderDashboard();
+  }, [token]);
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -93,35 +77,21 @@ const ProviderDashBoard = () => {
     setSelectedRequest(request);
     setShowContactModal(true);
   };
-
   const handleContactPurchase = async () => {
     if (!selectedRequest) return;
-
     try {
-      const response = await fetch(`${BACKEND_URL}/providers/customerContact`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token || accessToken}`,
-        },
-        body: JSON.stringify({
-          deductCoins: 50,
-          id: selectedRequest.userID,
-        }),
+      const response = await api.post("/providers/customerContact", {
+        deductCoins: 50,
+        id: selectedRequest.userID,
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        console.log("Contact Data", data);
-        alert(data.message);
-        setUserCoins(data.updatedCoins);
-
+      if (response.data.success) {
+        console.log("Contact Data", response.data);
+        alert(response.data.message);
+        setUserCoins(response.data.updatedCoins);
         const newContactedRequest = {
           requestId: selectedRequest._id,
-          customerContact: data.customerContact,
+          customerContact: response.data.customerContact,
         };
-
         setContactedRequests((prev) => {
           const updated = [...prev, newContactedRequest];
           const currentUserId = localStorage.getItem("userID");
@@ -129,22 +99,23 @@ const ProviderDashBoard = () => {
             `contactedRequests_${currentUserId}`,
             JSON.stringify(updated)
           );
-
           return updated;
         });
-
         setShowContactModal(false);
       } else {
-        alert(data.message);
+        alert(response.data.message);
         if (
-          data.message.includes("insufficient") ||
-          data.message.includes("not enough")
+          response.data.message.includes("insufficient") ||
+          response.data.message.includes("not enough")
         ) {
           navigate("/coins");
         }
       }
-    } catch (error) {
-      console.error("Error purchasing contact:", error);
+    } catch (error: any) {
+      console.error(
+        "Error purchasing contact:",
+        error.response?.data?.message || error.message
+      );
       alert("Error purchasing contact. Please try again.");
     }
   };

@@ -1,51 +1,41 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import { useSelector } from "react-redux";
-import { useParams, useNavigate } from "react-router";
-
+import { useLogout } from "./LogoutButton";
+import api from "../api/axios";
 interface ReviewData {
   userName: string;
   message: string;
 }
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
 const ProviderReviewPending = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const accessToken = localStorage.getItem("accessToken");
+  const logout = useLogout()
   const token = useSelector((state: any) => state.auth.jwtToken);
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let currentToken = token;
-    fetch(`${BACKEND_URL}/providers/providerUnderReview/${id}`, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${currentToken || accessToken}`,
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Provider review", data);
-        setReviewData(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-        setLoading(false);
-      });
-  }, [token, id]);
+    const fetchProviderReview = async () => {
+      try {
+        setLoading(true);
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userID");
-    localStorage.removeItem("userType");
-    localStorage.removeItem("providerStatus");
-    navigate("/login");
-  };
+        const res = await api.get(`/providers/providerUnderReview/${id}`);
+
+        console.log("Provider review", res.data);
+        setReviewData(res.data);
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProviderReview();
+    }
+  }, [id, token]);
+
 
   if (loading) {
     return (
@@ -132,7 +122,7 @@ const ProviderReviewPending = () => {
 
         <div className="flex flex-col gap-3">
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center"
           >
             <svg

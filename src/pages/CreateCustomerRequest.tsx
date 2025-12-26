@@ -1,13 +1,14 @@
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
-import { useSelector } from "react-redux";
 import { useState } from "react";
 import type CustomerRequest from "../interfaces/CustomerRequestInterface";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
+
+interface Request {
+  message: String;
+}
 
 const CreateCustomerRequest = () => {
-  const token = useSelector((state: any) => state.auth.jwtToken);
-  const accessToken = localStorage.getItem("accessToken");
   const [request, setRequest] = useState<CustomerRequest>({
     name: "",
     price: "",
@@ -30,26 +31,20 @@ const CreateCustomerRequest = () => {
     });
   };
 
-  // 🟢 Submit Request
-  const handleRequest = (e: React.FormEvent<HTMLFormElement>) => {
+  // Submit Request
+  const handleRequest = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Request :", request);
 
-    fetch(`${BACKEND_URL}/customers/request`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token || accessToken}`,
-      },
-      body: JSON.stringify(request),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Request message:", data.message);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-      });
+    try {
+      const res = await api.post<Request>("/customers/request", request);
+
+      const data = res.data;
+
+      console.log("Request message:", data.message);
+    } catch (err: any) {
+      console.log("Error :", err.response?.data?.message || err.message);
+    }
 
     // Reset
     setRequest({

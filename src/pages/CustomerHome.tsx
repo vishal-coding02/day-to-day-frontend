@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-// import { useSelector } from "react-redux";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const CustomerHomePage = () => {
-  // const token = useSelector((state: any) => state.auth.jwtToken);
-  const accessToken = localStorage.getItem("accessToken");
+  const navigate = useNavigate();
+  const token = useSelector((state: any) => state.auth.jwtToken);
+  const isAuthReady = useSelector((state: any) => state.auth.isAuthReady);
   const [activeCategory, setActiveCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -88,13 +90,15 @@ const CustomerHomePage = () => {
   ];
 
   useEffect(() => {
-    // Check if user is logged in
-    if (!accessToken) {
-      window.location.href = "/login";
+    if (!isAuthReady) return;
+
+    if (!token) {
+      navigate("/login");
       return;
     }
+
     setIsLoading(false);
-  }, [accessToken]);
+  }, [token, isAuthReady]);
 
   // Filter services based on active category
   const filteredServices =

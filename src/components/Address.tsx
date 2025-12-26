@@ -1,11 +1,11 @@
 import { useState } from "react";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import type AddressForm from "../interfaces/AddressInterfaces";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
+import api from "../api/axios";
 
 const AddressVerification = () => {
-  const navitage = useNavigate();
+  const navigate = useNavigate();
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -17,10 +17,8 @@ const AddressVerification = () => {
     addressType: "current",
     street: "",
     city: "",
-    cityId: 0,
     state: "",
-    stateId: 0,
-    zipCode: 0,
+    zipCode: "",
     country: "United States",
   });
 
@@ -36,50 +34,45 @@ const AddressVerification = () => {
     });
   };
 
-  function handleCheckAddress() {
+  async function handleCheckAddress() {
     if (!userId) {
       console.error("User ID is undefined!");
       return;
     }
 
-    fetch(`${BACKEND_URL}/users/address`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ id: userId, address: addressData }),
-    })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
-      .then(({ status, body }) => {
-        if (status === 200) {
-          setSuccessMsg(body.message);
-          setErrorMsg(null);
-        } else {
-          setErrorMsg(body.message);
-          setSuccessMsg(null);
-        }
-        console.log("Response from backend:", body);
-        if (userType == "provider") {
-          navitage("/providerProfileCreation");
-        } else {
-          navitage("/login");
-        }
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-        setErrorMsg("Something went wrong. Please try again.");
-        setSuccessMsg(null);
+    try {
+      const res = await api.post("/users/address", {
+        id: userId,
+        address: addressData,
       });
+
+      const data = res.data;
+
+      setSuccessMsg(data.message);
+      setErrorMsg(null);
+
+      console.log("Response from backend:", data);
+
+      if (userType === "provider") {
+        navigate("/providerProfileCreation");
+      } else {
+        navigate("/login");
+      }
+    } catch (err: any) {
+      console.log("Error :", err.response?.data?.message || err.message);
+      setErrorMsg(
+        err.response?.data?.message || "Something went wrong. Please try again."
+      );
+      setSuccessMsg(null);
+    }
 
     // Reset address form
     setAddressData({
       addressType: "current",
       street: "",
       city: "",
-      cityId: 0,
       state: "",
-      stateId: 0,
-      zipCode: 0,
+      zipCode: "",
       country: "United States",
     });
   }
@@ -100,15 +93,16 @@ const AddressVerification = () => {
         {/* Address Form */}
         <div className="p-6">
           <form
-            className="space-y-4"
+            className="space-y-6"
             onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
               e.preventDefault();
+              handleCheckAddress();
             }}
           >
             {/* Address Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Address Type
+                <strong>Address Type</strong>
               </label>
               <div className="flex space-x-6">
                 <div className="flex items-center">
@@ -123,7 +117,7 @@ const AddressVerification = () => {
                   />
                   <label
                     htmlFor="current"
-                    className="ml-2 block text-sm font-medium text-gray-700"
+                    className="ml-2 block text-sm text-gray-700"
                   >
                     Current Address
                   </label>
@@ -140,7 +134,7 @@ const AddressVerification = () => {
                   />
                   <label
                     htmlFor="permanent"
-                    className="ml-2 block text-sm font-medium text-gray-700"
+                    className="ml-2 block text-sm text-gray-700"
                   >
                     Permanent Address
                   </label>
@@ -148,120 +142,49 @@ const AddressVerification = () => {
               </div>
             </div>
 
+            {/* Street Address */}
             <div>
-              <label
-                htmlFor="street"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Street Address
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <strong>Street Address</strong>
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
+              <p className="text-sm text-gray-500 mb-2">
+                Enter your street address
+              </p>
+              <input
+                name="street"
+                type="text"
+                value={addressData.street}
+                onChange={handleInputChange}
+                placeholder="Enter your street address"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+              />
+            </div>
+
+            {/* City and State in one line */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* City */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <strong>City</strong>
+                </label>
+                <p className="text-sm text-gray-500 mb-2">City name</p>
                 <input
-                  id="street"
-                  name="street"
+                  name="city"
                   type="text"
-                  value={addressData.street}
+                  value={addressData.city}
                   onChange={handleInputChange}
-                  placeholder="Enter your street address"
-                  className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                  placeholder="City name"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
                 />
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-3">
+              {/* State */}
               <div>
-                <label
-                  htmlFor="city"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  City
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <strong>State</strong>
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    id="city"
-                    name="city"
-                    type="text"
-                    value={addressData.city}
-                    onChange={handleInputChange}
-                    placeholder="City name"
-                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="cityId"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  City ID
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 1a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 6h-1V5a4 4 0 00-4-4zm2 5V5a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    id="cityId"
-                    name="cityId"
-                    type="text"
-                    value={addressData.cityId}
-                    onChange={handleInputChange}
-                    placeholder="City ID"
-                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label
-                  htmlFor="state"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  State
-                </label>
+                <p className="text-sm text-gray-500 mb-2">Select state</p>
                 <select
-                  id="state"
                   name="state"
                   value={addressData.state}
                   onChange={handleInputChange}
@@ -275,86 +198,33 @@ const AddressVerification = () => {
                   <option value="IL">Illinois</option>
                 </select>
               </div>
-
-              <div>
-                <label
-                  htmlFor="stateId"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  State ID
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 1a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 6h-1V5a4 4 0 00-4-4zm2 5V5a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    id="stateId"
-                    name="stateId"
-                    type="text"
-                    value={addressData.stateId}
-                    onChange={handleInputChange}
-                    placeholder="State ID"
-                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                  />
-                </div>
-              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            {/* ZIP Code and Country in one line */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* ZIP Code */}
               <div>
-                <label
-                  htmlFor="zipCode"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  ZIP Code
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <strong>ZIP Code</strong>
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    id="zipCode"
-                    name="zipCode"
-                    type="text"
-                    value={addressData.zipCode}
-                    onChange={handleInputChange}
-                    placeholder="ZIP code"
-                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                  />
-                </div>
+                <p className="text-sm text-gray-500 mb-2">ZIP code</p>
+                <input
+                  name="zipCode"
+                  type="text"
+                  value={addressData.zipCode}
+                  onChange={handleInputChange}
+                  placeholder="ZIP code"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                />
               </div>
 
+              {/* Country */}
               <div>
-                <label
-                  htmlFor="country"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Country
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <strong>Country</strong>
                 </label>
+                <p className="text-sm text-gray-500 mb-2">Country</p>
                 <select
-                  id="country"
                   name="country"
                   value={addressData.country}
                   onChange={handleInputChange}
@@ -362,16 +232,16 @@ const AddressVerification = () => {
                 >
                   <option value="United States">United States</option>
                   <option value="Canada">Canada</option>
-                  <option value="IN">IN(India)</option>
+                  <option value="IN">India</option>
                 </select>
               </div>
             </div>
 
-            <div className="pt-2">
+            {/* Verify Button */}
+            <div className="pt-4">
               <button
                 type="submit"
-                onClick={handleCheckAddress}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 font-medium"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 font-medium text-lg"
               >
                 Verify Address
               </button>
@@ -380,7 +250,7 @@ const AddressVerification = () => {
 
           {/* Success Message */}
           {successMsg && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <svg
@@ -400,8 +270,7 @@ const AddressVerification = () => {
                   <h3 className="text-sm font-medium text-green-800">
                     Address Verified Successfully!
                   </h3>
-                  <p className="mt-1 text-xs text-green-700">{successMsg}</p>{" "}
-                  {/* Typo fix: errorMsg -> successMsg */}
+                  <p className="mt-1 text-sm text-green-700">{successMsg}</p>
                 </div>
               </div>
             </div>
@@ -409,7 +278,7 @@ const AddressVerification = () => {
 
           {/* Error Message */}
           {errorMsg && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <svg
@@ -429,7 +298,7 @@ const AddressVerification = () => {
                   <h3 className="text-sm font-medium text-red-800">
                     Service Not Available
                   </h3>
-                  <p className="mt-1 text-xs text-red-700">{errorMsg}</p>
+                  <p className="mt-1 text-sm text-red-700">{errorMsg}</p>
                 </div>
               </div>
             </div>

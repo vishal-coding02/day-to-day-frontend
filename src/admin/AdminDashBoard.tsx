@@ -1,93 +1,89 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
+import api from "../api/axios";
+import { useSelector } from "react-redux";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+interface ApproveProviderResponse {
+  message: string;
+}
+interface RejectProviderResponse {
+  message: string;
+}
+interface Provider {
+  _id: string;
+  userID: string;
+}
+
+interface PendingProvidersResponse {
+  allProviders: Provider[];
+}
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>("users");
-  const accessToken = localStorage.getItem("accessToken");
   const token = useSelector((state: any) => state.auth.jwtToken);
+  const [activeTab, setActiveTab] = useState<string>("users");
   const [pendingProvidersData, setPendingProvidersData] = useState<any[]>([]);
   const [usersData, setUsersData] = useState<any[]>([]);
   const [rejectReason, setRejectReason] = useState<string>("");
   const [selectedProvider, setSelectedProvider] = useState<any>(null);
   const [showRejectModal, setShowRejectModal] = useState<boolean>(false);
 
-  const handleApprove = async (provider: any) => {
+  const handleApprove = async (provider: Provider): Promise<void> => {
     try {
-      let currentToken = token || accessToken;
-
-      const res = await fetch(`${BACKEND_URL}/admin/approveProvider`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          Authorization: `Bearer ${currentToken}`,
-        },
-        body: JSON.stringify({
+      const res = await api.post<ApproveProviderResponse>(
+        "/admin/approveProvider",
+        {
           providerId: provider._id,
           userId: provider.userID,
-        }),
-      });
+        }
+      );
 
-      const data = await res.json();
-
-      if (res.ok) {
-        console.log("Provider Approved:", data);
-        alert(`Approval email sent successfully!`);
-        fetchPendingProviders();
-      } else {
-        console.error("Approval failed:", data);
-        alert(`Approval failed: ${data.message || "Unknown error"}`);
-      }
+      console.log("Provider Approved:", res.data);
+      alert("Approval email sent successfully!");
+      fetchPendingProviders();
     } catch (err: any) {
-      console.error("Error approving provider:", err.message);
-      alert("Error approving provider");
+      console.error(
+        "Error approving provider:",
+        err.response?.data?.message || err.message
+      );
+      alert(err.response?.data?.message || "Error approving provider");
     }
   };
 
-  const handleReject = async () => {
+  const handleReject = async (): Promise<void> => {
     if (!rejectReason.trim()) {
       alert("Please provide a reason for rejection");
       return;
     }
 
-    try {
-      let currentToken = token || accessToken;
+    if (!selectedProvider) return;
 
-      const res = await fetch(`${BACKEND_URL}/admin/rejectProvider`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          Authorization: `Bearer ${currentToken}`,
-        },
-        body: JSON.stringify({
+    try {
+      const res = await api.post<RejectProviderResponse>(
+        "/admin/rejectProvider",
+        {
           providerId: selectedProvider._id,
           userId: selectedProvider.userID,
           reason: rejectReason,
-        }),
-      });
+        }
+      );
 
-      const data = await res.json();
+      console.log("Provider Rejected:", res.data);
+      alert("Provider rejected successfully!");
 
-      if (res.ok) {
-        console.log("Provider Rejected:", data);
-        alert(`Provider rejected successfully!`);
-        setShowRejectModal(false);
-        setRejectReason("");
-        setSelectedProvider(null);
+      setShowRejectModal(false);
+      setRejectReason("");
+      setSelectedProvider(null);
 
-        fetchPendingProviders();
-      } else {
-        console.error("Rejection failed:", data);
-        alert(`Rejection failed: ${data.message || "Unknown error"}`);
-      }
+      fetchPendingProviders();
     } catch (err: any) {
-      console.error("Error rejecting provider:", err.message);
-      alert("Error rejecting provider");
+      console.error(
+        "Error rejecting provider:",
+        err.response?.data?.message || err.message
+      );
+      alert(err.response?.data?.message || "Error rejecting provider");
     }
   };
 
@@ -103,29 +99,23 @@ const AdminDashboard = () => {
     setRejectReason("");
   };
 
-  const fetchPendingProviders = () => {
-    let currentToken = token;
-    fetch(`${BACKEND_URL}/admin/pendingProviders`, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${currentToken || accessToken}`,
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("All Pending Providers", data);
+  const fetchPendingProviders = async (): Promise<void> => {
+    try {
+      const res = await api.get<PendingProvidersResponse>(
+        "/admin/pendingProviders"
+      );
 
-        if (Array.isArray(data.allProviders)) {
-          setPendingProvidersData(data.allProviders);
-        } else {
-          setPendingProvidersData([]);
-        }
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-      });
+      const data = res.data;
+      console.log("All Pending Providers", data);
+
+      if (Array.isArray(data.allProviders)) {
+        setPendingProvidersData(data.allProviders);
+      } else {
+        setPendingProvidersData([]);
+      }
+    } catch (err: any) {
+      console.log("Error :", err.response?.data?.message || err.message);
+    }
   };
 
   useEffect(() => {
@@ -133,17 +123,10 @@ const AdminDashboard = () => {
   }, [token]);
 
   useEffect(() => {
-    let currentToken = token;
-    fetch(`${BACKEND_URL}/admin/users`, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${currentToken || accessToken}`,
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    async function fetchAllUsers() {
+      try {
+        const res = await api.get("/admin/users");
+        const data = res.data;
         console.log("All Users", data);
 
         if (Array.isArray(data.allUsers)) {
@@ -151,10 +134,12 @@ const AdminDashboard = () => {
         } else {
           setUsersData([]);
         }
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-      });
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
+      }
+    }
+
+    fetchAllUsers();
   }, [token]);
 
   return (

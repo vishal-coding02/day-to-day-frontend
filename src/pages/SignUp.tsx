@@ -3,9 +3,9 @@ import type SignUpForm from "../interfaces/SignUpInterface";
 import { useDispatch } from "react-redux";
 import { signupAction } from "../redux/reducer/AuthReducer";
 import { useNavigate } from "react-router";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
+import api from "../api/axios";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -18,39 +18,54 @@ const SignUp = () => {
     email: "",
   });
 
-  const handleSignUp = () => {
-    console.log(users);
+  const handleSignUp = async (): Promise<void> => {
+    if (
+      !users.name.trim() ||
+      !users.email.trim() ||
+      !users.password.trim() ||
+      !users.phone
+    ) {
+      alert("All fields are required");
+      return;
+    }
 
-    fetch(`${BACKEND_URL}/users/signUp`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(users),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        console.log("user created", data);
+    const payload = {
+      name: users.name.trim(),
+      email: users.email.trim(),
+      password: users.password,
+      phone: String(users.phone),
+      userType: users.userType,
+    };
 
-        dispatch(
-          signupAction({ ...users, userId: data.userId, type: data.type })
-        );
+    console.log("Signup Payload:", payload);
 
-        navigate("/otpVerification");
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
+    try {
+      const res = await api.post("/users/signUp", payload);
+
+      const data = res.data;
+      console.log("User created:", data);
+
+      dispatch(
+        signupAction({
+          ...payload,
+          userId: data.userId,
+          type: data.type,
+        })
+      );
+
+      navigate("/otpVerification");
+
+      // RESET FORM
+      setUsers({
+        name: "",
+        phone: 0,
+        userType: "customer",
+        password: "",
+        email: "",
       });
-
-    // Reset form values
-    setUsers({
-      name: "",
-      phone: 0,
-      userType: "customer",
-      password: "",
-      email: "",
-    });
+    } catch (err: any) {
+      console.log("Signup Error:", err.response?.data?.message || err.message);
+    }
   };
 
   return (

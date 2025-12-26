@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
+import api from "../api/axios";
 
 const CommonHome = () => {
   const token = useSelector((state: any) => state.auth.jwtToken);
-  const accessToken = localStorage.getItem("accessToken");
   const [userCoins, setUserCoins] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [userType, setUserType] = useState(""); // 'customer' or 'provider'
@@ -125,30 +125,19 @@ const CommonHome = () => {
   ];
 
   useEffect(() => {
-    // Check if user is logged in and fetch data
-    if (accessToken) {
+    if (token) {
       fetchUserData();
-      // For demo, set user type - in real app, get from API
-      setUserType("customer"); // Change to "provider" for provider view
+      setUserType("customer");
     } else {
       setIsLoading(false);
     }
-  }, [accessToken]);
+  }, [token]);
 
   const fetchUserData = async () => {
     try {
-      // Fetch coins balance for providers
       if (userType === "provider") {
-        const COINS_URL = import.meta.env.VITE_COINS_URL;
-        const response = await fetch(COINS_URL, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token || accessToken}`,
-          },
-        });
-        const data = await response.json();
-        setUserCoins(data.userCoins || 0);
+        const res = await api.get("/coins");
+        setUserCoins(res.data.userCoins || 0);
       }
       setIsLoading(false);
     } catch (error) {
@@ -158,7 +147,7 @@ const CommonHome = () => {
   };
 
   const getWelcomeMessage = () => {
-    if (!accessToken) {
+    if (!token) {
       return "Quality Home Services At Your Doorstep";
     }
     return userType === "provider"
@@ -167,7 +156,7 @@ const CommonHome = () => {
   };
 
   const getSubtitle = () => {
-    if (!accessToken) {
+    if (!token) {
       return "Connect with trusted professionals for all your home maintenance and repair needs";
     }
     return userType === "provider"
@@ -179,7 +168,7 @@ const CommonHome = () => {
     return quickActions.filter(
       (action) =>
         action.visible.includes(userType) ||
-        (!accessToken && action.visible.includes(""))
+        (!token && action.visible.includes(""))
     );
   };
 
@@ -214,7 +203,7 @@ const CommonHome = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
           <div className="text-center">
-            {accessToken && (
+            {token && (
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-white bg-opacity-20 text-blue-100 text-sm font-medium mb-6">
                 {userType === "provider"
                   ? "🚀 Grow Your Business"
@@ -235,7 +224,7 @@ const CommonHome = () => {
 
             {/* Dynamic CTA Buttons based on login status */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              {!accessToken ? (
+              {!token ? (
                 <>
                   <button
                     onClick={() => (window.location.href = "/signup")}
@@ -267,7 +256,7 @@ const CommonHome = () => {
             </div>
 
             {/* Stats for logged-in users */}
-            {accessToken && (
+            {token && (
               <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-white">
@@ -313,7 +302,7 @@ const CommonHome = () => {
       </div>
 
       {/* Quick Stats Section for logged-in users */}
-      {accessToken && userType === "provider" && (
+      {token && userType === "provider" && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-lg border border-blue-200 text-center">
@@ -338,10 +327,10 @@ const CommonHome = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            {accessToken ? "Popular Services" : "Our Services"}
+            {token ? "Popular Services" : "Our Services"}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {accessToken
+            {token
               ? "Services you might be interested in"
               : "Professional home services delivered by verified experts"}
           </p>
@@ -366,13 +355,13 @@ const CommonHome = () => {
                 </p>
                 <button
                   onClick={() =>
-                    (window.location.href = accessToken
+                    (window.location.href = token
                       ? `/book-service/${category.name.toLowerCase()}`
                       : `/services/${category.name.toLowerCase()}`)
                   }
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors text-sm"
                 >
-                  {accessToken ? "Book Now" : "Explore Services"}
+                  {token ? "Book Now" : "Explore Services"}
                 </button>
               </div>
             </div>
@@ -388,7 +377,7 @@ const CommonHome = () => {
               Why Choose Us?
             </h2>
             <p className="text-lg text-gray-600">
-              {accessToken
+              {token
                 ? "We're committed to your satisfaction"
                 : "Experience the difference with our customer-first approach"}
             </p>
@@ -417,12 +406,12 @@ const CommonHome = () => {
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 py-16">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-white mb-6">
-            {accessToken
+            {token
               ? "Need Help With Something Else?"
               : "Ready to Get Started?"}
           </h2>
           <p className="text-blue-100 mb-8 text-lg">
-            {accessToken
+            {token
               ? "We're here to help with all your home service needs"
               : "Join thousands of satisfied customers and professional service providers"}
           </p>
@@ -431,9 +420,9 @@ const CommonHome = () => {
               onClick={() => (window.location.href = "/signup")}
               className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
-              {accessToken ? "Post New Request" : "Sign Up as Customer"}
+              {token ? "Post New Request" : "Sign Up as Customer"}
             </button>
-            {!accessToken && (
+            {!token && (
               <button
                 onClick={() => (window.location.href = "/signup")}
                 className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"

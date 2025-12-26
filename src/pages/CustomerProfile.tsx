@@ -1,51 +1,38 @@
-import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
+import { useSelector } from "react-redux";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import type CustomerProfile from "../interfaces/CustomerInterface";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
+import { useLogout } from "../components/LogoutButton";
 
 const CustomerProfilePage = () => {
-  const token = useSelector((state: any) => state.auth.jwtToken);
+  const logout = useLogout()
   const [customerData, setCustomerData] = useState<CustomerProfile | null>(
     null
   );
+  const token = useSelector((state: any) => state.auth.jwtToken);
   const [activeTab, setActiveTab] = useState("profile");
-  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      let currentToken = token;
       try {
-        const res = await fetch(`${BACKEND_URL}/customers/profile/${id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${currentToken || accessToken}`,
-          },
-          credentials: "include",
-        });
-        const data = await res.json();
+        const res = await api.get(`/customers/profile/${id}`);
+
+        const data = await res.data;
         console.log("customer profile response:", data);
+
         setCustomerData(data.data);
       } catch (err: any) {
-        console.log("customer profile fetch error:", err.message);
+        console.log("Error :", err.response?.data?.message || err.message);
       }
     };
 
     fetchData();
-  }, [token, id, accessToken]);
-
-  function handleLogout() {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userID");
-    localStorage.removeItem("userType");
-    navigate("/login");
-  }
+  }, [id, token]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -303,7 +290,7 @@ const CustomerProfilePage = () => {
                     </p>
                   </div>
                   <button
-                    onClick={handleLogout}
+                    onClick={logout}
                     className="mt-3 sm:mt-0 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
                   >
                     <i className="fas fa-sign-out-alt mr-2"></i> Log Out

@@ -3,14 +3,12 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
 import type ProviderProfileData from "../interfaces/ProviderProfileInterface";
 
 const FindProviders = () => {
   const navigate = useNavigate();
-  // State for search and filters
   const token = useSelector((state: any) => state.auth.jwtToken);
-  const accessToken = localStorage.getItem("accessToken");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
@@ -22,39 +20,36 @@ const FindProviders = () => {
   }
 
   useEffect(() => {
-    let queryParams = new URLSearchParams();
+    const fetchProviders = async () => {
+      try {
+        let queryParams = new URLSearchParams();
+        if (searchTerm.trim() !== "") {
+          queryParams.append("name", searchTerm);
+        }
+        if (priceRange.trim() !== "all") {
+          queryParams.append("priceRange", priceRange);
+        }
+        if (selectedService !== "all") {
+          queryParams.append("serviceType", selectedService);
+        }
 
-    if (searchTerm.trim() !== "") {
-      queryParams.append("name", searchTerm);
-    }
-    if (priceRange.trim() !== "all") {
-      queryParams.append("priceRange", priceRange);
-    }
-    if (selectedService !== "all") {
-      queryParams.append("serviceType", selectedService);
-    }
+        navigate(`?${queryParams.toString()}`, { replace: true });
 
-    navigate(`?${queryParams.toString()}`, { replace: true });
+        const response = await api.get(
+          `/customers/providers?${queryParams.toString()}`
+        );
 
-    let url = `${BACKEND_URL}/customers/providers?${queryParams.toString()}`;
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${token || accessToken}`,
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.data && Array.isArray(data.data)) {
-          setProviders(data.data);
-          console.log(data.data);
+        if (response.data.data && Array.isArray(response.data.data)) {
+          setProviders(response.data.data);
+          console.log(response.data.data);
         } else {
           setProviders([]);
         }
-      })
-      .catch((err) => console.log("Error :", err.message));
+      } catch (error: any) {
+        console.log("Error :", error.response?.data?.message || error.message);
+      }
+    };
+    fetchProviders();
   }, [searchTerm, priceRange, selectedService, token]);
 
   return (

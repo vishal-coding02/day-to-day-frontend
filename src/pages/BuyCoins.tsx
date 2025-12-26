@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
 
 const BuyCoins = () => {
-  const token = useSelector((state: any) => state.auth.jwtToken);
-  const accessToken = localStorage.getItem("accessToken");
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [userData, setUserData] = useState({
     userName: "",
@@ -53,55 +50,49 @@ const BuyCoins = () => {
     });
   };
 
-  const handleBuyCoins = async () => {
-    if (!selectedPackage) {
-      alert("Please select a coin package");
-      return;
+
+const handleBuyCoins = async () => {
+  if (!selectedPackage) {
+    alert("Please select a coin package");
+    return;
+  }
+
+  if (!userData.userName || !userData.userPhone) {
+    alert("Please fill in all your details");
+    return;
+  }
+
+  const selectedPkg = coinPackages.find(
+    (pkg) => pkg.id === selectedPackage
+  );
+  if (!selectedPkg) return;
+
+  try {
+    const { data } = await api.post("/buyCoins", {
+      name: userData.userName,
+      phone: userData.userPhone,
+      packageID: selectedPkg.id,
+      packageName: selectedPkg.name,
+      coins: selectedPkg.coins,
+      price: selectedPkg.price,
+      paymentMethod,
+    });
+
+    if (data.success) {
+      console.log("Coins purchased:", data.message);
+      alert(`${selectedPkg.coins} coins purchased successfully!`);
+    } else {
+      alert(`Purchase failed: ${data.message}`);
     }
-
-    if (!userData.userName || !userData.userPhone) {
-      alert("Please fill in all your details");
-      return;
-    }
-
-    const selectedPkg = coinPackages.find((pkg) => pkg.id === selectedPackage);
-    if (!selectedPkg) return;
-
-    try {
-      const response = await fetch(`${BACKEND_URL}/buyCoins`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token || accessToken}`,
-        },
-        body: JSON.stringify({
-          name: userData.userName,
-          phone: userData.userPhone,
-          packageID: selectedPkg.id,
-          packageName: selectedPkg.name,
-          coins: selectedPkg.coins,
-          price: selectedPkg.price,
-          paymentMethod,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        console.log("Coins purchased :", data.message);
-        alert(`${selectedPkg.coins} coins purchased successfully!`);
-      } else {
-        alert(`Purchase failed: ${data.message}`);
-      }
-    } catch (err) {
-      console.error("Buy Coins Error:", err);
-      alert("Something went wrong while purchasing coins.");
-    } finally {
-      // Reset form
-      setSelectedPackage(null);
-      setUserData({ userName: "", userPhone: "" });
-    }
-  };
+  } catch (err) {
+    console.error("Buy Coins Error:", err);
+    alert("Something went wrong while purchasing coins.");
+  } finally {
+    // Reset form
+    setSelectedPackage(null);
+    setUserData({ userName: "", userPhone: "" });
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col">

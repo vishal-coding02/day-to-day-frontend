@@ -5,12 +5,20 @@ import type ProviderProfileData from "../interfaces/ProviderProfileInterface";
 import type { ServicePackage } from "../interfaces/ServicePackageInterface";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
+import { useLogout } from "../components/LogoutButton";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
+
+interface PurchaseContactResponse {
+  updatedCoins: number;
+  message?: string;
+}
 
 const ProviderProfile = () => {
+  const logout = useLogout();
   const navigate = useNavigate();
   const userType = localStorage.getItem("userType");
+  const token = useSelector((state: any) => state.auth.jwtToken);
   const [userCoins, setUserCoins] = useState(0);
   const { id } = useParams();
   const [providerData, setProviderData] = useState<ProviderProfileData | null>(
@@ -22,46 +30,31 @@ const ProviderProfile = () => {
     "profile" | "packages" | "settings" | "contact"
   >("profile");
   const [contactVisible, setContactVisible] = useState(false);
-  const accessToken = localStorage.getItem("accessToken");
-  const token = useSelector((state: any) => state.auth.jwtToken);
 
   useEffect(() => {
-    if (!accessToken) return;
+    const fetchCoins = async () => {
+      try {
+        const res = await api.get("/coins");
 
-    fetch(`${BACKEND_URL}/coins`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token || accessToken}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Coins :", data.userCoins);
-        setUserCoins(data.userCoins);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-      });
+        console.log("Coins :", res.data.userCoins);
+        setUserCoins(res.data.userCoins);
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
+      }
+    };
+
+    fetchCoins();
   }, [token]);
 
   useEffect(() => {
     const fetchData = async () => {
-      let currentToken = token;
       try {
-        const res = await fetch(`${BACKEND_URL}/providers/profile/${id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${currentToken || accessToken}`,
-          },
-          credentials: "include",
-        });
-        const data = await res.json();
-        console.log("Provider Profile:", data);
+        const res = await api.get(`/providers/profile/${id}`);
+        const data = await res.data;
+
         setProviderData(data.providerData);
       } catch (err: any) {
-        console.log("Profile fetch error:", err.message);
+        console.log("Error :", err.response?.data?.message || err.message);
       }
     };
 
@@ -70,69 +63,51 @@ const ProviderProfile = () => {
 
   useEffect(() => {
     const fetchPackages = async () => {
-      let currentToken = token;
       try {
-        const res = await fetch(`${BACKEND_URL}/packages/providerPackages/${id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${currentToken || accessToken}`,
-          },
-          credentials: "include",
-        });
-        const data = await res.json();
+        const res = await api.get(`/packages/providerPackages/${id}`);
+        const data = res.data;
         console.log("Provider Packages:", data);
         setPackages(data.myPackages || []);
       } catch (err: any) {
-        console.log("Packages fetch error:", err.message);
+        console.log("Error :", err.response?.data?.message || err.message);
       }
     };
 
     fetchPackages();
-  }, [token, id]);
+  }, [id, token]);
 
   useEffect(() => {
     const checkUnlocked = async () => {
-      const res = await fetch(`${BACKEND_URL}/hasUnlocked/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token || accessToken}`,
-        },
-      });
-      const data = await res.json();
-      setUnlocked(data.unlocked);
+      try {
+        const res = await api.get(`/hasUnlocked/${id}`);
+        const data = await res.data;
+
+        setUnlocked(data.unlocked);
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
+      }
     };
     checkUnlocked();
   }, [id]);
 
   // Function to handle contact purchase
-  const handlePurchaseContact = async () => {
+  const handlePurchaseContact = async (): Promise<void> => {
     try {
-      const response = await fetch(`${BACKEND_URL}/coins`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token || accessToken}`,
-        },
-        body: JSON.stringify({
-          deduct: 200,
-          id,
-        }),
+      const res = await api.patch<PurchaseContactResponse>("/coins", {
+        deduct: 200,
+        id,
       });
 
-      const data = await response.json();
+      const data = res.data;
 
-      if (response.ok) {
-        // Update user coins
-        setUserCoins(data.updatedCoins);
-        // Show provider contact info
-        setContactVisible(true);
-      } else {
-        alert(data.message || "Purchase failed");
-      }
-    } catch (error) {
-      console.error("Purchase error:", error);
-      alert("An error occurred during purchase");
+      setUserCoins(data.updatedCoins);
+      setContactVisible(true);
+    } catch (err: any) {
+      console.error(
+        "Purchase error:",
+        err.response?.data?.message || err.message
+      );
+      alert(err.response?.data?.message || "An error occurred during purchase");
     }
   };
 
@@ -155,15 +130,6 @@ const ProviderProfile = () => {
     }
     return stars;
   };
-
-  function handleLogout() {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userID");
-    localStorage.removeItem("userType");
-    localStorage.removeItem("providerStatus");
-    localStorage.removeItem("contactedRequests");
-    navigate("/login");
-  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -642,7 +608,7 @@ const ProviderProfile = () => {
                     </p>
                   </div>
                   <button
-                    onClick={handleLogout}
+                    onClick={logout}
                     className="mt-3 sm:mt-0 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
                   >
                     <i className="fas fa-sign-out-alt mr-2"></i> Log Out

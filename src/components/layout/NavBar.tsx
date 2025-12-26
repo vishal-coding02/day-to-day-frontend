@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { Link } from "react-router-dom";
+import api from "../../api/axios";
 
 const NavBar = () => {
   const userType = localStorage.getItem("userType");
-  const accessToken = localStorage.getItem("accessToken");
+  const token = useSelector((state: any) => state.auth.jwtToken);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userID = localStorage.getItem("userID");
-  const token = useSelector((state: any) => state.auth.jwtToken);
   const [userCoins, setUserCoins] = useState(0);
 
   const toggleMenu = () => {
@@ -16,24 +15,21 @@ const NavBar = () => {
   };
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!token) return;
 
-    fetch(`${BACKEND_URL}/coins`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token || accessToken}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Coins :", data.userCoins);
-        setUserCoins(data.userCoins);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-      });
-  }, [token]);
+    const fetchCoins = async () => {
+      try {
+        const res = await api.get("/coins");
+
+        console.log("Coins :", res.data.userCoins);
+        setUserCoins(res.data.userCoins);
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
+      }
+    };
+
+    fetchCoins();
+  }, [userCoins, token]);
 
   return (
     <nav className="bg-white shadow-sm">
@@ -57,7 +53,7 @@ const NavBar = () => {
                 >
                   About
                 </Link>
-                {accessToken && userType === "admin" && (
+                {token && userType === "admin" && (
                   <Link
                     to="/adminDashBoard"
                     className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors"
@@ -71,7 +67,7 @@ const NavBar = () => {
                 >
                   Buy Coins
                 </Link>
-                {accessToken && userType === "provider" && (
+                {token && userType === "provider" && (
                   <>
                     <Link
                       to="/providerDashBoard"
@@ -93,7 +89,7 @@ const NavBar = () => {
                     </Link>
                   </>
                 )}
-                {accessToken && userType === "customer" && (
+                {token && userType === "customer" && (
                   <>
                     <Link
                       to="/findProviders"
@@ -122,7 +118,7 @@ const NavBar = () => {
           {/* Right side of navbar */}
           <div className="flex items-center space-x-4">
             {/* Coins display - only show for logged-in users */}
-            {accessToken && (
+            {token && (
               <div className="hidden md:flex items-center px-4 py-2 rounded-full shadow-sm bg-white">
                 <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center mr-2">
                   <i className="fas fa-coins text-yellow-800 text-xs"></i>
@@ -135,7 +131,7 @@ const NavBar = () => {
             )}
 
             {/* Desktop Auth Buttons */}
-            {!accessToken && (
+            {!token && (
               <div className="hidden md:flex items-center space-x-4">
                 <Link
                   to="/login"
@@ -201,7 +197,7 @@ const NavBar = () => {
         <div className={`${isMenuOpen ? "block" : "hidden"} md:hidden`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mt-2">
             {/* Coins display in mobile menu */}
-            {accessToken && (
+            {token && (
               <div className="flex items-center px-3 py-2">
                 <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center mr-2">
                   <i className="fas fa-coins text-yellow-800 text-xs"></i>
@@ -234,7 +230,7 @@ const NavBar = () => {
             >
               Buy Coins
             </Link>
-            {accessToken && userType === "provider" && (
+            {token && userType === "provider" && (
               <>
                 <Link
                   to="/providerDashBoard"
@@ -259,7 +255,7 @@ const NavBar = () => {
                 </Link>
               </>
             )}
-            {accessToken && userType === "customer" && (
+            {token && userType === "customer" && (
               <>
                 <Link
                   to="/findProviders"
@@ -285,7 +281,7 @@ const NavBar = () => {
               </>
             )}
             {/* Mobile Auth Buttons (visible only when logged out) */}
-            {!accessToken && (
+            {!token && (
               <div className="pt-4 pb-3 border-t border-gray-200">
                 <div className="flex flex-col space-y-2">
                   <Link

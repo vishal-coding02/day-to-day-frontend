@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { useSelector } from "react-redux";
 import type ProviderInfoResponse from "../interfaces/AdminDashBord";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
+import { useSelector } from "react-redux";
 
 const ReviewProviderProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const accessToken = localStorage.getItem("accessToken");
   const token = useSelector((state: any) => state.auth.jwtToken);
   const [providerInfo, setProviderInfo] = useState<ProviderInfoResponse | null>(
     null
@@ -16,26 +14,26 @@ const ReviewProviderProfile = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let currentToken = token;
-    fetch(`${BACKEND_URL}/admin/reviewProviderProfile/${id}`, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${currentToken || accessToken}`,
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchProviderInfo = async (): Promise<void> => {
+      try {
+        setLoading(true);
+
+        const res = await api.get(`/admin/reviewProviderProfile/${id}`);
+
+        const data = res.data;
         console.log("Provider Data", data);
         setProviderInfo(data);
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-        setLoading(false);
-      });
-  }, [token, id]);
+      }
+    };
+
+    if (id) {
+      fetchProviderInfo();
+    }
+  }, [id, token]);
 
   if (loading) {
     return (

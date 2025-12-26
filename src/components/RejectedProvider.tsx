@@ -1,46 +1,36 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
+import { useLogout } from "./LogoutButton";
 
 const RejectedProvider = () => {
-  const navigate = useNavigate();
+  const logout = useLogout()
+  const token = useSelector((state: any) => state.auth.jwtToken);
   const [rejectedData, setRejectedData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const accessToken = localStorage.getItem("accessToken");
-  const token = useSelector((state: any) => state.auth.jwtToken);
+
   const id = localStorage.getItem("userID");
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userID");
-    localStorage.removeItem("providerID");
-    navigate("/login");
-  };
-
   useEffect(() => {
-    let currentToken = token;
-    setLoading(true);
-    fetch(`${BACKEND_URL}/rejected/${id}`, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${currentToken || accessToken}`,
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("rejected provider data", data.rejectedData);
-        setRejectedData(data.rejectedData);
+    const fetchRejectedProvider = async () => {
+      try {
+        setLoading(true);
+
+        const res = await api.get(`/rejected/${id}`);
+
+        console.log("rejected provider data", res.data.rejectedData);
+        setRejectedData(res.data.rejectedData);
+      } catch (err: any) {
+        console.log("Error :", err.response?.data?.message || err.message);
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.log("Error :", err.message);
-        setLoading(false);
-      });
-  }, [token, id]);
+      }
+    };
+
+    if (id) {
+      fetchRejectedProvider();
+    }
+  }, [id, token]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -87,7 +77,7 @@ const RejectedProvider = () => {
             We couldn't find any rejection information for your account.
           </p>
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-colors"
           >
             Logout
@@ -110,7 +100,7 @@ const RejectedProvider = () => {
               <p className="text-blue-100">Provider Account Review</p>
             </div>
             <button
-              onClick={handleLogout}
+              onClick={logout}
               className="flex items-center space-x-2 px-6 py-2 bg-amber-50 bg-opacity-20 text-blue-600 rounded-lg hover:bg-opacity-30 transition-all duration-200 backdrop-blur-sm cursor-pointer"
             >
               <svg

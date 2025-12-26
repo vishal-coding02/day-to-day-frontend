@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../api/axios";
+
+interface OtpVerifyResponse {
+  success: boolean;
+  message: string;
+}
 
 const OTPVerification = () => {
   const navigate = useNavigate();
@@ -33,33 +38,32 @@ const OTPVerification = () => {
     }
   };
 
-  const handleOtpVerification = () => {
-    const otpValue = otp.join("");
-    console.log("Sent OTP:", otpValue); // Check yeh value
-    console.log("Sent OTP Type:", typeof otpValue); // Ensure string hai
-    fetch(`${BACKEND_URL}/verifyOtp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+  const handleOtpVerification = async (): Promise<void> => {
+    const otpValue: string = otp.join("");
+
+    console.log("Sent OTP:", otpValue);
+    console.log("Sent OTP Type:", typeof otpValue);
+
+    try {
+      const res = await api.post<OtpVerifyResponse>("/verifyEmail", {
         otp: otpValue,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setSuccessMessage(data.message);
-          setErrorMessage("");
-          navigate("/address");
-        } else {
-          setErrorMessage(data.message || "Invalid OTP");
-          setSuccessMessage("");
-        }
-      })
-      .catch((err) => {
-        console.log("Error:", err.message);
       });
+
+      const data = res.data;
+
+      if (data.success) {
+        setSuccessMessage(data.message);
+        setErrorMessage("");
+        navigate("/address");
+      } else {
+        setErrorMessage(data.message || "Invalid OTP");
+        setSuccessMessage("");
+      }
+    } catch (err: any) {
+      console.log("Error:", err.response?.data?.message || err.message);
+      setErrorMessage("Something went wrong");
+      setSuccessMessage("");
+    }
   };
 
   return (
@@ -71,7 +75,7 @@ const OTPVerification = () => {
             Verify Your Account
           </h1>
           <p className="text-center opacity-90 mt-2">
-            Enter the 6-digit code sent to your phone
+            Enter the 6-digit code sent to your email
           </p>
         </div>
 
