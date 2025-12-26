@@ -1,9 +1,7 @@
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useNavigate } from "react-router";
+import api from "../api/axios";
 import { logout } from "../redux/reducer/AuthReducer";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const useLogout = () => {
   const dispatch = useDispatch();
@@ -11,8 +9,8 @@ export const useLogout = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(
-        `${BACKEND_URL}/users/logout`,
+      await api.post(
+        "/users/logout",
         {},
         { withCredentials: true }
       );
