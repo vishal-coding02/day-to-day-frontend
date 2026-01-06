@@ -59,7 +59,7 @@ const ProviderProfile = () => {
     };
 
     fetchData();
-  }, [token]);
+  }, [id, token]);
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -207,6 +207,7 @@ const ProviderProfile = () => {
                     }
                     alt={providerData?.providerName}
                     className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
+                      loading="lazy"
                   />
                   <div className="absolute -bottom-2 -right-2 bg-blue-100 rounded-full p-2">
                     <i className="fas fa-check-circle text-blue-600 text-xl"></i>
