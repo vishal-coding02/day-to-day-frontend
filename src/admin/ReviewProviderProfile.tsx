@@ -123,6 +123,7 @@ const ReviewProviderProfile = () => {
                 src={providerData.providerImageUrl}
                 alt="Profile"
                 className="w-20 h-20 rounded-full object-cover border-4 border-white"
+                loading="lazy"
               />
               <div>
                 <h1 className="text-2xl font-bold">
@@ -300,6 +301,7 @@ const ReviewProviderProfile = () => {
                       src={providerData.providerIdProf}
                       alt="Professional ID"
                       className="max-w-full h-64 object-contain border rounded-lg"
+                      loading="lazy"
                     />
                   </div>
                 </div>

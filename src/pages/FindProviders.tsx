@@ -194,6 +194,7 @@ const FindProviders = () => {
                       src={provider.providerImageUrl}
                       alt={provider.providerName}
                       className="w-full h-full object-cover rounded-full border-4 border-white shadow-md"
+                      loading="lazy"
                     />
                     <div className="absolute -bottom-2 -right-2 bg-white rounded-full px-3 py-1 shadow flex items-center">
                       <svg

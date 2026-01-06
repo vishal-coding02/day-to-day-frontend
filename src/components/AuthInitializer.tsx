@@ -26,6 +26,7 @@ const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
     restoreSession();
   }, []);
 
+
   return <>{children}</>;
 };
 

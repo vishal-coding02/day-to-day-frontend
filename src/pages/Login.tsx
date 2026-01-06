@@ -2,10 +2,7 @@ import { useState } from "react";
 import type LoginForm from "../interfaces/LoginInterface";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
-import {
-  jwtTokenAction,
-  loginAction,
-} from "../redux/reducer/AuthReducer";
+import { jwtTokenAction, loginAction } from "../redux/reducer/AuthReducer";
 import api from "../api/axios.js";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";

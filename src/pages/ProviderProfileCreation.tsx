@@ -91,6 +91,19 @@ const PPC = () => {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
+    const MAX_SIZE = 200 * 1024;
+
+    if (file?.type !== "image/webp") {
+      alert("Only webp images are allowed");
+      return;
+    }
+
+    if (file?.size > MAX_SIZE) {
+      alert("Image is very heavy, max 200kb allowed");
+      return;
+    }
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -107,6 +120,18 @@ const PPC = () => {
 
   const handleAadhaarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
+    const MAX_SIZE = 200 * 1024;
+
+    if (file?.type !== "image/webp") {
+      alert("Only webp images are allowed");
+      return;
+    }
+
+    if (file?.size > MAX_SIZE) {
+      alert("Image is very heavy, max 200kb allowed");
+      return;
+    }
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -326,7 +351,7 @@ const PPC = () => {
                               Click to upload Aadhaar card
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
-                              PNG, JPG up to 5MB
+                              WEBP up to 200KB
                             </p>
                           </div>
                         )}
@@ -533,7 +558,7 @@ const PPC = () => {
                                 Click to upload profile photo
                               </p>
                               <p className="text-xs text-gray-500 mt-1">
-                                PNG, JPG up to 5MB
+                                WEBP up to 200KB
                               </p>
                             </div>
                           )}
