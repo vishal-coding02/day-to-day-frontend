@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { lazy, Suspense } from "react";
 import AuthInitializer from "./components/AuthInitializer.tsx";
