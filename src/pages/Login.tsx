@@ -78,7 +78,7 @@ const Login = () => {
       const res = await api.post("/users/login", requestData);
 
       const data = res.data;
-      console.log("Login success:", data);
+      console.log("Login success:");
 
       dispatch(jwtTokenAction(data.accessToken));
       dispatch(loginAction(data));
