@@ -3,7 +3,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: `${BACKEND_URL}`,
-  withCredentials: true, //
+  withCredentials: true,
 });
 
 export default api;
