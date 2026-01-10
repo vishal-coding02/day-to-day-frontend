@@ -9,17 +9,22 @@ export const useLogout = () => {
 
   const handleLogout = async () => {
     try {
-      await api.post(
+      const res = await api.post(
         "/users/logout",
         {},
         { withCredentials: true }
       );
-    } finally {
-      dispatch(logout());
-      localStorage.removeItem("userID");
-      localStorage.removeItem("userType");
-      localStorage.removeItem("providerStatus");
-      navigate("/login");
+
+      if (res.status === 200) {
+        dispatch(logout());
+        localStorage.removeItem("userID");
+        localStorage.removeItem("userType");
+        localStorage.removeItem("providerStatus");
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      alert("Logout failed. Please try again.");
     }
   };
 
