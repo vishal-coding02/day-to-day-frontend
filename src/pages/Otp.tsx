@@ -30,7 +30,7 @@ const OTPVerification = () => {
     index: number
   ) => {
     if (
-      e.key === "Backspace" &&
+      e.key === "Backspace" &&-
       !otp[index] &&
       e.currentTarget.previousSibling
     ) {
@@ -47,6 +47,7 @@ const OTPVerification = () => {
     try {
       const res = await api.post<OtpVerifyResponse>("/verifyEmail", {
         otp: otpValue,
+        purpose  : "EMAIL_VERIFY"
       });
 
       const data = res.data;

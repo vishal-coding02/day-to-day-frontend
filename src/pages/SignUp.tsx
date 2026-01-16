@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import api from "../api/axios";
+import { Eye, EyeOff } from "lucide-react";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const SignUp = () => {
     password: "",
     email: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = async (): Promise<void> => {
     if (
@@ -40,7 +42,7 @@ const SignUp = () => {
     console.log("Signup Payload:", payload);
 
     try {
-      const res = await api.post("/users/signUp", payload);
+      const res = await api.post("/auth/signUp", payload);
 
       const data = res.data;
       console.log("User created:", data);
@@ -290,7 +292,7 @@ const SignUp = () => {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setUsers({ ...users, password: e.target.value });
                     }}
@@ -298,6 +300,13 @@ const SignUp = () => {
                     className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
                 </div>
               </div>
 

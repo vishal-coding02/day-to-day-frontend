@@ -6,10 +6,12 @@ import { jwtTokenAction, loginAction } from "../redux/reducer/AuthReducer";
 import api from "../api/axios.js";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [loginData, setLoginData] = useState<LoginForm>({
     phone: "",
@@ -75,7 +77,7 @@ const Login = () => {
     console.log("Sending login data:", requestData);
 
     try {
-      const res = await api.post("/users/login", requestData);
+      const res = await api.post("/auth/login", requestData);
 
       const data = res.data;
       console.log("Login success:");
@@ -250,12 +252,19 @@ const Login = () => {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={loginData.password}
                     onChange={handleInputChange}
                     placeholder="Enter your password"
                     className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
                 </div>
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password}</p>
@@ -279,12 +288,12 @@ const Login = () => {
                 </div>
 
                 <div className="text-sm">
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600 hover:text-blue-500"
+                  <span
+                    onClick={() => navigate("/forgotPassword")}
+                    className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
                   >
                     Forgot password?
-                  </a>
+                  </span>
                 </div>
               </div>
 
