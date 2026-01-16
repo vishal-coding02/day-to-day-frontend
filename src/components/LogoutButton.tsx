@@ -10,7 +10,7 @@ export const useLogout = () => {
   const handleLogout = async () => {
     try {
       const res = await api.post(
-        "/users/logout",
+        "/auth/logout",
         {},
         { withCredentials: true }
       );

@@ -41,7 +41,7 @@ const AddressVerification = () => {
     }
 
     try {
-      const res = await api.post("/users/address", {
+      const res = await api.post("/auth/address", {
         id: userId,
         address: addressData,
       });

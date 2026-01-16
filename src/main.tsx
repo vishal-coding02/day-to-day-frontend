@@ -31,7 +31,11 @@ const CustomerProfile = lazy(() => import("./pages/CustomerProfile.tsx"));
 const RejectedProvider = lazy(
   () => import("./components/RejectedProvider.tsx")
 );
+const PasswordResetSuccess = lazy(
+  () => import("./pages/PasswordResetSuccess.tsx")
+);
 const AboutUs = lazy(() => import("./pages/AboutPage"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const router = createBrowserRouter([
   {
     path: "/",
@@ -50,6 +54,10 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
+    path: "/password-reset-success",
+    element: <PasswordResetSuccess />,
+  },
+  {
     path: "/providerProfileCreation",
     element: <PPC />,
   },
@@ -60,6 +68,10 @@ const router = createBrowserRouter([
   {
     path: "/adminDashBoard",
     element: <AdminDashboard />,
+  },
+  {
+    path: "/forgotPassword",
+    element: <ForgotPassword />,
   },
   {
     path: "/reviewProviderProfile/:id",
