@@ -31,20 +31,20 @@ const ProviderProfile = () => {
   >("profile");
   const [contactVisible, setContactVisible] = useState(false);
 
-  useEffect(() => {
-    const fetchCoins = async () => {
-      try {
-        const res = await api.get("/coins");
+  // useEffect(() => {
+  //   const fetchCoins = async () => {
+  //     try {
+  //       const res = await api.get("/coins");
 
-        console.log("Coins :", res.data.userCoins);
-        setUserCoins(res.data.userCoins);
-      } catch (err: any) {
-        console.log("Error :", err.response?.data?.message || err.message);
-      }
-    };
+  //       console.log("Coins :", res.data.userCoins);
+  //       setUserCoins(res.data.userCoins);
+  //     } catch (err: any) {
+  //       console.log("Error :", err.response?.data?.message || err.message);
+  //     }
+  //   };
 
-    fetchCoins();
-  }, [token]);
+  //   fetchCoins();
+  // }, [token]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,7 +66,6 @@ const ProviderProfile = () => {
       try {
         const res = await api.get(`/packages/providerPackages/${id}`);
         const data = res.data;
-        console.log("Provider Packages:", data);
         setPackages(data.myPackages || []);
       } catch (err: any) {
         console.log("Error :", err.response?.data?.message || err.message);

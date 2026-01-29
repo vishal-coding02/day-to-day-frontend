@@ -39,13 +39,11 @@ const SignUp = () => {
       userType: users.userType,
     };
 
-    console.log("Signup Payload:", payload);
-
     try {
       const res = await api.post("/auth/signUp", payload);
 
       const data = res.data;
-      console.log("User created:", data);
+      console.log("User created:");
 
       dispatch(
         signupAction({

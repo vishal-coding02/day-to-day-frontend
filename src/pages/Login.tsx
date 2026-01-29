@@ -74,8 +74,6 @@ const Login = () => {
       [loginType]: loginData[loginType],
     };
 
-    console.log("Sending login data:", requestData);
-
     try {
       const res = await api.post("/auth/login", requestData);
 
