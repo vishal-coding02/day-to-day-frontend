@@ -15,7 +15,6 @@ import {
   FileText,
   Users,
   CheckCircle,
-  Loader2
 } from "lucide-react";
 
 const CustomerHomePage = () => {
@@ -23,7 +22,6 @@ const CustomerHomePage = () => {
   const token = useSelector((state: any) => state.auth.jwtToken);
   const isAuthReady = useSelector((state: any) => state.auth.isAuthReady);
   const [activeCategory, setActiveCategory] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
 
   // Service categories for customers
   const serviceCategories = [
@@ -104,14 +102,10 @@ const CustomerHomePage = () => {
   ];
 
   useEffect(() => {
-    if (!isAuthReady) return;
-
-    if (!token) {
+    if (isAuthReady && !token) {
       navigate("/login");
       return;
     }
-
-    setIsLoading(false);
   }, [token, isAuthReady]);
 
   // Filter services based on active category
@@ -119,19 +113,8 @@ const CustomerHomePage = () => {
     activeCategory === "all"
       ? popularServices
       : popularServices.filter(
-          (service) => service.category === activeCategory
+          (service) => service.category === activeCategory,
         );
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 text-blue-600 animate-spin mx-auto" />
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -182,7 +165,9 @@ const CustomerHomePage = () => {
                     : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
                 }`}
               >
-                <Icon className={`w-4 h-4 ${activeCategory === category.id ? "text-white" : "text-blue-600"}`} />
+                <Icon
+                  className={`w-4 h-4 ${activeCategory === category.id ? "text-white" : "text-blue-600"}`}
+                />
                 <span>{category.name}</span>
               </button>
             );
@@ -215,7 +200,10 @@ const CustomerHomePage = () => {
 
                 <div className="flex items-center gap-1 mb-3">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-4 h-4 ${i < Math.floor(service.rating) ? "text-yellow-500 fill-current" : "text-gray-300"}`} />
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${i < Math.floor(service.rating) ? "text-yellow-500 fill-current" : "text-gray-300"}`}
+                    />
                   ))}
                   <span className="text-gray-600 text-xs ml-1">
                     {service.rating} ({service.reviews})
