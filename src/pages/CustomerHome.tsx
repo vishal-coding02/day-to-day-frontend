@@ -100,11 +100,12 @@ const CustomerHomePage = () => {
       time: "Next day",
     },
   ];
-
+  
   useEffect(() => {
-    if (isAuthReady && !token) {
+    if (!isAuthReady) return;
+
+    if (!token) {
       navigate("/login");
-      return;
     }
   }, [token, isAuthReady]);
 
