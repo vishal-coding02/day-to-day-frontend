@@ -3,6 +3,25 @@ import { useSelector } from "react-redux";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import api from "../api/axios";
+import { 
+  Droplets, 
+  Zap, 
+  Sparkles, 
+  Hammer, 
+  CheckCircle, 
+  IndianRupee, 
+  Shield, 
+  Clock, 
+  FileText, 
+  Search, 
+  ClipboardList, 
+  User, 
+  Coins, 
+  Calendar,
+  Loader2,
+  TrendingUp,
+  Star
+} from "lucide-react";
 
 const CommonHome = () => {
   const token = useSelector((state: any) => state.auth.jwtToken);
@@ -15,28 +34,28 @@ const CommonHome = () => {
     {
       id: 1,
       name: "Plumbing",
-      icon: "🚰",
+      icon: Droplets,
       description: "Fixing leaks, installations, and repairs",
       gradient: "from-blue-500 to-cyan-500",
     },
     {
       id: 2,
       name: "Electrical",
-      icon: "⚡",
+      icon: Zap,
       description: "Wiring, repairs, and installations",
       gradient: "from-yellow-500 to-orange-500",
     },
     {
       id: 3,
       name: "Cleaning",
-      icon: "🧹",
+      icon: Sparkles,
       description: "Home and office cleaning services",
       gradient: "from-green-500 to-emerald-500",
     },
     {
       id: 4,
       name: "Carpentry",
-      icon: "🪚",
+      icon: Hammer,
       description: "Furniture repair and woodwork",
       gradient: "from-amber-600 to-orange-600",
     },
@@ -45,24 +64,28 @@ const CommonHome = () => {
   // Features section
   const features = [
     {
-      icon: "✅",
+      icon: CheckCircle,
       title: "Verified Professionals",
       description: "All service providers are background verified and skilled",
+      color: "text-green-600"
     },
     {
-      icon: "💰",
+      icon: IndianRupee,
       title: "Best Price Guarantee",
       description: "Get competitive prices with no hidden charges",
+      color: "text-blue-600"
     },
     {
-      icon: "🛡️",
+      icon: Shield,
       title: "Service Guarantee",
       description: "30-day service warranty on all repairs",
+      color: "text-purple-600"
     },
     {
-      icon: "⚡",
+      icon: Clock,
       title: "Quick Response",
       description: "Get connected with providers within minutes",
+      color: "text-orange-600"
     },
   ];
 
@@ -72,7 +95,7 @@ const CommonHome = () => {
       id: 1,
       title: "Post Service Request",
       description: "Describe what you need and get quotes",
-      icon: "📝",
+      icon: FileText,
       url: "/post-request",
       color: "bg-blue-600 hover:bg-blue-700",
       visible: ["customer", ""],
@@ -81,7 +104,7 @@ const CommonHome = () => {
       id: 2,
       title: "Browse Services",
       description: "Find service providers near you",
-      icon: "🔍",
+      icon: Search,
       url: "/services",
       color: "bg-green-600 hover:bg-green-700",
       visible: ["customer", ""],
@@ -90,7 +113,7 @@ const CommonHome = () => {
       id: 3,
       title: "View Requests",
       description: "Check new service requests",
-      icon: "📋",
+      icon: ClipboardList,
       url: "/provider-dashboard",
       color: "bg-purple-600 hover:bg-purple-700",
       visible: ["provider"],
@@ -99,7 +122,7 @@ const CommonHome = () => {
       id: 4,
       title: "My Profile",
       description: "Update your profile and services",
-      icon: "👤",
+      icon: User,
       url: "/profile",
       color: "bg-indigo-600 hover:bg-indigo-700",
       visible: ["customer", "provider"],
@@ -108,7 +131,7 @@ const CommonHome = () => {
       id: 5,
       title: "Buy Coins",
       description: "Get coins to contact customers",
-      icon: "🪙",
+      icon: Coins,
       url: "/buy-coins",
       color: "bg-yellow-600 hover:bg-yellow-700",
       visible: ["provider"],
@@ -117,7 +140,7 @@ const CommonHome = () => {
       id: 6,
       title: "My Bookings",
       description: "View your service bookings",
-      icon: "📅",
+      icon: Calendar,
       url: "/bookings",
       color: "bg-orange-600 hover:bg-orange-700",
       visible: ["customer"],
@@ -176,7 +199,7 @@ const CommonHome = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <Loader2 className="h-12 w-12 text-blue-600 animate-spin mx-auto" />
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -206,10 +229,10 @@ const CommonHome = () => {
             {token && (
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-white bg-opacity-20 text-blue-100 text-sm font-medium mb-6">
                 {userType === "provider"
-                  ? "🚀 Grow Your Business"
+                  ? <><TrendingUp className="w-4 h-4 mr-2" /> Grow Your Business</>
                   : "👋 Welcome Back"}
                 {userType === "provider" && userCoins > 0 && (
-                  <span className="ml-2">• {userCoins} Coins Available</span>
+                  <span className="ml-2">• <Coins className="w-4 h-4 inline mr-1" />{userCoins} Available</span>
                 )}
               </div>
             )}
@@ -228,29 +251,34 @@ const CommonHome = () => {
                 <>
                   <button
                     onClick={() => (window.location.href = "/signup")}
-                    className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-lg"
+                    className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-lg flex items-center gap-2"
                   >
+                    <User className="w-5 h-5" />
                     Become a Customer
                   </button>
                   <button
                     onClick={() => (window.location.href = "/signup")}
-                    className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-600 transform hover:-translate-y-1 transition-all duration-300"
+                    className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-600 transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-2"
                   >
+                    <TrendingUp className="w-5 h-5" />
                     Become a Provider
                   </button>
                 </>
               ) : (
                 <div className="flex flex-wrap justify-center gap-3">
-                  {getFilteredQuickActions().map((action) => (
-                    <button
-                      key={action.id}
-                      onClick={() => (window.location.href = action.url)}
-                      className={`px-5 py-3 text-white rounded-lg font-semibold transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 ${action.color}`}
-                    >
-                      <span>{action.icon}</span>
-                      <span>{action.title}</span>
-                    </button>
-                  ))}
+                  {getFilteredQuickActions().map((action) => {
+                    const Icon = action.icon;
+                    return (
+                      <button
+                        key={action.id}
+                        onClick={() => (window.location.href = action.url)}
+                        className={`px-5 py-3 text-white rounded-lg font-semibold transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 ${action.color}`}
+                      >
+                        <Icon className="w-5 h-5" />
+                        <span>{action.title}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -259,7 +287,8 @@ const CommonHome = () => {
             {token && (
               <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-white">
+                  <div className="text-2xl font-bold text-white flex items-center justify-center">
+                    <ClipboardList className="w-6 h-6 mr-2" />
                     {userType === "provider" ? "12" : "3"}
                   </div>
                   <div className="text-blue-200 text-sm">
@@ -269,7 +298,8 @@ const CommonHome = () => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-white">
+                  <div className="text-2xl font-bold text-white flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 mr-2" />
                     {userType === "provider" ? "45" : "12"}
                   </div>
                   <div className="text-blue-200 text-sm">
@@ -279,7 +309,8 @@ const CommonHome = () => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-white">
+                  <div className="text-2xl font-bold text-white flex items-center justify-center">
+                    <Star className="w-6 h-6 mr-2 fill-current" />
                     {userType === "provider" ? "4.8" : "4.9"}
                   </div>
                   <div className="text-blue-200 text-sm">Average Rating</div>
@@ -306,17 +337,24 @@ const CommonHome = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-lg border border-blue-200 text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-blue-600 flex items-center justify-center">
+                <Coins className="w-6 h-6 mr-2" />
                 {userCoins}
               </div>
               <div className="text-gray-600 text-sm">Available Coins</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg border border-green-200 text-center">
-              <div className="text-2xl font-bold text-green-600">12</div>
+              <div className="text-2xl font-bold text-green-600 flex items-center justify-center">
+                <ClipboardList className="w-6 h-6 mr-2" />
+                12
+              </div>
               <div className="text-gray-600 text-sm">New Requests</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg border border-purple-200 text-center">
-              <div className="text-2xl font-bold text-purple-600">₹12,500</div>
+              <div className="text-2xl font-bold text-purple-600 flex items-center justify-center">
+                <IndianRupee className="w-6 h-6 mr-2" />
+                12,500
+              </div>
               <div className="text-gray-600 text-sm">Total Earnings</div>
             </div>
           </div>
@@ -337,35 +375,41 @@ const CommonHome = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {serviceCategories.map((category) => (
-            <div
-              key={category.id}
-              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200"
-            >
+          {serviceCategories.map((category) => {
+            const Icon = category.icon;
+            return (
               <div
-                className={`h-2 bg-gradient-to-r ${category.gradient}`}
-              ></div>
-              <div className="p-6 text-center">
-                <div className="text-4xl mb-4">{category.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {category.name}
-                </h3>
-                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                  {category.description}
-                </p>
-                <button
-                  onClick={() =>
-                    (window.location.href = token
-                      ? `/book-service/${category.name.toLowerCase()}`
-                      : `/services/${category.name.toLowerCase()}`)
-                  }
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors text-sm"
-                >
-                  {token ? "Book Now" : "Explore Services"}
-                </button>
+                key={category.id}
+                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200"
+              >
+                <div
+                  className={`h-2 bg-gradient-to-r ${category.gradient}`}
+                ></div>
+                <div className="p-6 text-center">
+                  <div className="flex justify-center mb-4">
+                    <Icon className="w-12 h-12 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    {category.name}
+                  </h3>
+                  <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                    {category.description}
+                  </p>
+                  <button
+                    onClick={() =>
+                      (window.location.href = token
+                        ? `/book-service/${category.name.toLowerCase()}`
+                        : `/services/${category.name.toLowerCase()}`)
+                    }
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors text-sm flex items-center justify-center gap-2 mx-auto"
+                  >
+                    <Search className="w-4 h-4" />
+                    {token ? "Book Now" : "Explore Services"}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -384,20 +428,25 @@ const CommonHome = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-blue-50 rounded-xl p-6 text-center hover:bg-blue-100 transition-all duration-300 border border-blue-200"
-              >
-                <div className="text-3xl mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={index}
+                  className="bg-blue-50 rounded-xl p-6 text-center hover:bg-blue-100 transition-all duration-300 border border-blue-200"
+                >
+                  <div className="flex justify-center mb-4">
+                    <Icon className={`w-10 h-10 ${feature.color}`} />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -418,15 +467,17 @@ const CommonHome = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => (window.location.href = "/signup")}
-              className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
             >
+              <FileText className="w-5 h-5" />
               {token ? "Post New Request" : "Sign Up as Customer"}
             </button>
             {!token && (
               <button
                 onClick={() => (window.location.href = "/signup")}
-                className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+                className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors flex items-center justify-center gap-2"
               >
+                <TrendingUp className="w-5 h-5" />
                 Become a Provider
               </button>
             )}

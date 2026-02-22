@@ -37,7 +37,7 @@ const PPC = () => {
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
 
@@ -155,7 +155,7 @@ const PPC = () => {
   };
 
   const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
 
@@ -171,7 +171,7 @@ const PPC = () => {
         "/providers/profileCreation",
         {
           ...formData,
-        }
+        },
       );
 
       console.log("Profile created:", res.data);
@@ -181,7 +181,6 @@ const PPC = () => {
     }
   };
 
-  // Services options
   const serviceOptions: string[] = [
     "Plumbing",
     "Electrical",
@@ -201,7 +200,7 @@ const PPC = () => {
   ];
 
   const filteredServices = serviceOptions.filter((service) =>
-    service.toLowerCase().includes(searchTerm.toLowerCase())
+    service.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
