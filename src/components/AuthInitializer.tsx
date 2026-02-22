@@ -14,17 +14,18 @@ const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
         const res = await axios.post(
           `${BACKEND_URL}/api/refreshToken`,
           {},
-          { withCredentials: true },
+          { withCredentials: true }
         );
 
         dispatch(jwtTokenAction(res.data.accessToken));
-      } catch {}
+      } catch {
+        dispatch(jwtTokenAction(null));
+      }
     };
 
-    if (document.cookie.includes("refreshToken")) {
-      restoreSession();
-    }
+    restoreSession();
   }, []);
+
 
   return <>{children}</>;
 };
