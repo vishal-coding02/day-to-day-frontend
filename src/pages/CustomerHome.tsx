@@ -3,6 +3,20 @@ import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
+import {
+  Home,
+  Droplets,
+  Zap,
+  Sparkles,
+  Hammer,
+  ThermometerSnowflake,
+  Star,
+  Clock,
+  FileText,
+  Users,
+  CheckCircle,
+  Loader2
+} from "lucide-react";
 
 const CustomerHomePage = () => {
   const navigate = useNavigate();
@@ -16,32 +30,32 @@ const CustomerHomePage = () => {
     {
       id: "all",
       name: "All Services",
-      icon: "🏠",
+      icon: Home,
     },
     {
       id: "plumbing",
       name: "Plumbing",
-      icon: "🚰",
+      icon: Droplets,
     },
     {
       id: "electrical",
       name: "Electrical",
-      icon: "⚡",
+      icon: Zap,
     },
     {
       id: "cleaning",
       name: "Cleaning",
-      icon: "🧹",
+      icon: Sparkles,
     },
     {
       id: "carpentry",
       name: "Carpentry",
-      icon: "🪚",
+      icon: Hammer,
     },
     {
       id: "ac",
       name: "AC Repair",
-      icon: "❄️",
+      icon: ThermometerSnowflake,
     },
   ];
 
@@ -112,7 +126,7 @@ const CustomerHomePage = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <Loader2 className="h-12 w-12 text-blue-600 animate-spin mx-auto" />
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -156,20 +170,23 @@ const CustomerHomePage = () => {
 
         {/* Category Filters */}
         <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {serviceCategories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setActiveCategory(category.id)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 text-sm ${
-                activeCategory === category.id
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-              }`}
-            >
-              <span className="text-lg">{category.icon}</span>
-              <span>{category.name}</span>
-            </button>
-          ))}
+          {serviceCategories.map((category) => {
+            const Icon = category.icon;
+            return (
+              <button
+                key={category.id}
+                onClick={() => setActiveCategory(category.id)}
+                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 text-sm ${
+                  activeCategory === category.id
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${activeCategory === category.id ? "text-white" : "text-blue-600"}`} />
+                <span>{category.name}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Services Grid */}
@@ -197,14 +214,16 @@ const CustomerHomePage = () => {
                 </p>
 
                 <div className="flex items-center gap-1 mb-3">
-                  <span className="text-yellow-500 text-sm">★★★★★</span>
-                  <span className="text-gray-600 text-xs">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={`w-4 h-4 ${i < Math.floor(service.rating) ? "text-yellow-500 fill-current" : "text-gray-300"}`} />
+                  ))}
+                  <span className="text-gray-600 text-xs ml-1">
                     {service.rating} ({service.reviews})
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-gray-600 mb-3">
-                  <span>⏱️</span>
+                  <Clock className="w-4 h-4" />
                   <span>{service.time}</span>
                 </div>
 
@@ -234,7 +253,7 @@ const CustomerHomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <span className="text-xl">📝</span>
+                <FileText className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Post Request</h3>
               <p className="text-gray-600 text-sm">
@@ -244,7 +263,7 @@ const CustomerHomePage = () => {
 
             <div className="text-center">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <span className="text-xl">👥</span>
+                <Users className="w-6 h-6 text-green-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Get Quotes</h3>
               <p className="text-gray-600 text-sm">
@@ -254,7 +273,7 @@ const CustomerHomePage = () => {
 
             <div className="text-center">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <span className="text-xl">✅</span>
+                <CheckCircle className="w-6 h-6 text-purple-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Book Service</h3>
               <p className="text-gray-600 text-sm">
