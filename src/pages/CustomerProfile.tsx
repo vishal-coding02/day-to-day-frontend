@@ -8,9 +8,9 @@ import api from "../api/axios";
 import { useLogout } from "../components/LogoutButton";
 
 const CustomerProfilePage = () => {
-  const logout = useLogout()
+  const logout = useLogout();
   const [customerData, setCustomerData] = useState<CustomerProfile | null>(
-    null
+    null,
   );
   const token = useSelector((state: any) => state.auth.jwtToken);
   const [activeTab, setActiveTab] = useState("profile");
@@ -23,7 +23,7 @@ const CustomerProfilePage = () => {
         const res = await api.get(`/customers/profile/${id}`);
 
         const data = await res.data;
-        console.log("customer profile response:", data);
+        console.log(data.message);
 
         setCustomerData(data.data);
       } catch (err: any) {
@@ -114,7 +114,7 @@ const CustomerProfilePage = () => {
                         Member since{" "}
                         {customerData?.createdAt
                           ? new Date(
-                              customerData?.createdAt
+                              customerData?.createdAt,
                             ).toLocaleDateString()
                           : "N/A"}
                       </span>
@@ -188,7 +188,7 @@ const CustomerProfilePage = () => {
                         Joined:{" "}
                         {customerData?.createdAt
                           ? new Date(
-                              customerData?.createdAt
+                              customerData?.createdAt,
                             ).toLocaleDateString()
                           : "N/A"}
                       </span>
@@ -217,7 +217,7 @@ const CustomerProfilePage = () => {
                     You haven't purchased any provider contacts yet
                   </p>
                   <button
-                    onClick={() => navigate("/providers")}
+                    onClick={() => navigate("/findProviders")}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
                   >
                     Browse Service Providers

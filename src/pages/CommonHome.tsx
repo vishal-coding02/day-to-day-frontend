@@ -3,31 +3,29 @@ import { useSelector } from "react-redux";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import api from "../api/axios";
-import { 
-  Droplets, 
-  Zap, 
-  Sparkles, 
-  Hammer, 
-  CheckCircle, 
-  IndianRupee, 
-  Shield, 
-  Clock, 
-  FileText, 
-  Search, 
-  ClipboardList, 
-  User, 
-  Coins, 
+import {
+  Droplets,
+  Zap,
+  Sparkles,
+  Hammer,
+  CheckCircle,
+  IndianRupee,
+  Shield,
+  Clock,
+  FileText,
+  Search,
+  ClipboardList,
+  User,
+  Coins,
   Calendar,
-  Loader2,
   TrendingUp,
-  Star
+  Star,
 } from "lucide-react";
 
 const CommonHome = () => {
   const token = useSelector((state: any) => state.auth.jwtToken);
   const [userCoins, setUserCoins] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userType, setUserType] = useState(""); // 'customer' or 'provider'
+  const [userType, setUserType] = useState("");
 
   // Mock data for service categories
   const serviceCategories = [
@@ -67,25 +65,25 @@ const CommonHome = () => {
       icon: CheckCircle,
       title: "Verified Professionals",
       description: "All service providers are background verified and skilled",
-      color: "text-green-600"
+      color: "text-green-600",
     },
     {
       icon: IndianRupee,
       title: "Best Price Guarantee",
       description: "Get competitive prices with no hidden charges",
-      color: "text-blue-600"
+      color: "text-blue-600",
     },
     {
       icon: Shield,
       title: "Service Guarantee",
       description: "30-day service warranty on all repairs",
-      color: "text-purple-600"
+      color: "text-purple-600",
     },
     {
       icon: Clock,
       title: "Quick Response",
       description: "Get connected with providers within minutes",
-      color: "text-orange-600"
+      color: "text-orange-600",
     },
   ];
 
@@ -151,8 +149,6 @@ const CommonHome = () => {
     if (token) {
       fetchUserData();
       setUserType("customer");
-    } else {
-      setIsLoading(false);
     }
   }, [token]);
 
@@ -162,10 +158,8 @@ const CommonHome = () => {
         const res = await api.get("/coins");
         setUserCoins(res.data.userCoins || 0);
       }
-      setIsLoading(false);
     } catch (error) {
       console.log("Error fetching user data:", error);
-      setIsLoading(false);
     }
   };
 
@@ -191,20 +185,9 @@ const CommonHome = () => {
     return quickActions.filter(
       (action) =>
         action.visible.includes(userType) ||
-        (!token && action.visible.includes(""))
+        (!token && action.visible.includes("")),
     );
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 text-blue-600 animate-spin mx-auto" />
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -228,11 +211,18 @@ const CommonHome = () => {
           <div className="text-center">
             {token && (
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-white bg-opacity-20 text-blue-100 text-sm font-medium mb-6">
-                {userType === "provider"
-                  ? <><TrendingUp className="w-4 h-4 mr-2" /> Grow Your Business</>
-                  : "👋 Welcome Back"}
+                {userType === "provider" ? (
+                  <>
+                    <TrendingUp className="w-4 h-4 mr-2" /> Grow Your Business
+                  </>
+                ) : (
+                  "👋 Welcome Back"
+                )}
                 {userType === "provider" && userCoins > 0 && (
-                  <span className="ml-2">• <Coins className="w-4 h-4 inline mr-1" />{userCoins} Available</span>
+                  <span className="ml-2">
+                    • <Coins className="w-4 h-4 inline mr-1" />
+                    {userCoins} Available
+                  </span>
                 )}
               </div>
             )}
@@ -455,9 +445,7 @@ const CommonHome = () => {
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 py-16">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-white mb-6">
-            {token
-              ? "Need Help With Something Else?"
-              : "Ready to Get Started?"}
+            {token ? "Need Help With Something Else?" : "Ready to Get Started?"}
           </h2>
           <p className="text-blue-100 mb-8 text-lg">
             {token

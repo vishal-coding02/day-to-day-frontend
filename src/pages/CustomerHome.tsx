@@ -15,7 +15,6 @@ import {
   FileText,
   Users,
   CheckCircle,
-  Loader2,
 } from "lucide-react";
 
 const CustomerHomePage = () => {
@@ -23,7 +22,6 @@ const CustomerHomePage = () => {
   const token = useSelector((state: any) => state.auth.jwtToken);
   const isAuthReady = useSelector((state: any) => state.auth.isAuthReady);
   const [activeCategory, setActiveCategory] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
 
   // Service categories for customers
   const serviceCategories = [
@@ -110,8 +108,6 @@ const CustomerHomePage = () => {
       navigate("/login");
       return;
     }
-
-    setIsLoading(false);
   }, [token, isAuthReady]);
 
   // Filter services based on active category
@@ -121,17 +117,6 @@ const CustomerHomePage = () => {
       : popularServices.filter(
           (service) => service.category === activeCategory,
         );
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 text-blue-600 animate-spin mx-auto" />
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">

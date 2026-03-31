@@ -18,10 +18,9 @@ import {
   Sparkles,
   Clock,
   Calendar,
-  Loader2,
   Star,
   Users,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 
 const ProviderHomePage = () => {
@@ -33,7 +32,6 @@ const ProviderHomePage = () => {
   const [activeRequests, setActiveRequests] = useState(0);
   const [completedJobs, setCompletedJobs] = useState(0);
   const [earnings, setEarnings] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Mock data for available service requests
   const serviceRequests = [
@@ -177,10 +175,8 @@ const ProviderHomePage = () => {
     try {
       const res = await api.get("/coins");
       setUserCoins(res.data.userCoins || 0);
-      setIsLoading(false);
     } catch (err: any) {
       console.log("Error :", err.response?.data?.message || err.message);
-      setIsLoading(false);
     }
   };
 
@@ -199,17 +195,6 @@ const ProviderHomePage = () => {
   const handleBuyCoins = () => {
     window.location.href = "/coins";
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 text-blue-600 animate-spin mx-auto" />
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
