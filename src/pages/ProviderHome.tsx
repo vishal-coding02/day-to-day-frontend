@@ -18,10 +18,9 @@ import {
   Sparkles,
   Clock,
   Calendar,
-  Loader2,
   Star,
   Users,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 
 const ProviderHomePage = () => {
@@ -196,7 +195,6 @@ const ProviderHomePage = () => {
   const handleBuyCoins = () => {
     window.location.href = "/coins";
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">

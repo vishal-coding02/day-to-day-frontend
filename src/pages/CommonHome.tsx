@@ -18,7 +18,6 @@ import {
   User,
   Coins,
   Calendar,
-  Loader2,
   TrendingUp,
   Star,
 } from "lucide-react";

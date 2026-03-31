@@ -15,7 +15,6 @@ import {
   FileText,
   Users,
   CheckCircle,
-  Loader2,
 } from "lucide-react";
 
 const CustomerHomePage = () => {
