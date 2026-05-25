@@ -21,3 +21,24 @@ export default interface CustomerProfile {
 
   createdAt?: string;
 }
+
+export interface CustomerContactData {
+  _id: string;
+  requestID: string;
+  providerID: string;
+  customerID: string;
+  providerName: string;
+  customerName: string;
+  customerNumber: string;
+  servicesNeeded: string[];
+  offeredPrice: number;
+  coinsSpent: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PurchaseContactResponse {
+  updatedCoins: number;
+  message?: string;
+}
