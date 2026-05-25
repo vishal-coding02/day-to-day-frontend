@@ -6,13 +6,11 @@ import type { ServicePackage } from "../interfaces/ServicePackageInterface";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import { useLogout } from "../components/LogoutButton";
-
 import api from "../api/axios";
-
-interface PurchaseContactResponse {
-  updatedCoins: number;
-  message?: string;
-}
+import type {
+  CustomerContactData,
+  PurchaseContactResponse,
+} from "../interfaces/CustomerInterface";
 
 const ProviderProfile = () => {
   const logout = useLogout();
@@ -22,29 +20,18 @@ const ProviderProfile = () => {
   const [userCoins, setUserCoins] = useState(0);
   const { id } = useParams();
   const [providerData, setProviderData] = useState<ProviderProfileData | null>(
-    null
+    null,
   );
   const [unlocked, setUnlocked] = useState(false);
   const [packages, setPackages] = useState<ServicePackage[]>([]);
   const [activeTab, setActiveTab] = useState<
-    "profile" | "packages" | "settings" | "contact"
+    "profile" | "packages" | "settings" | "contact" | "customerContacts"
   >("profile");
   const [contactVisible, setContactVisible] = useState(false);
+  const [customerContacts, setCustomerContacts] = useState<
+    CustomerContactData[]
+  >([]);
 
-  // useEffect(() => {
-  //   const fetchCoins = async () => {
-  //     try {
-  //       const res = await api.get("/coins");
-
-  //       console.log("Coins :", res.data.userCoins);
-  //       setUserCoins(res.data.userCoins);
-  //     } catch (err: any) {
-  //       console.log("Error :", err.response?.data?.message || err.message);
-  //     }
-  //   };
-
-  //   fetchCoins();
-  // }, [token]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,7 +76,26 @@ const ProviderProfile = () => {
     checkUnlocked();
   }, [id]);
 
-  // Function to handle contact purchase
+  useEffect(() => {
+    const fetchCustomerContacts = async () => {
+      try {
+        const res = await api.get("/providers/customerContact");
+        const data = await res.data;
+          console.log(data)
+        setCustomerContacts(data);
+      } catch (err: any) {
+        console.log(
+          "Error fetching customer contacts:",
+          err.response?.data?.message || err.message,
+        );
+      }
+    };
+
+    if (userType === "provider" && activeTab === "customerContacts") {
+      fetchCustomerContacts();
+    }
+  }, [activeTab, userType, token]);
+
   const handlePurchaseContact = async (): Promise<void> => {
     try {
       const res = await api.patch<PurchaseContactResponse>("/coins", {
@@ -104,13 +110,12 @@ const ProviderProfile = () => {
     } catch (err: any) {
       console.error(
         "Purchase error:",
-        err.response?.data?.message || err.message
+        err.response?.data?.message || err.message,
       );
       alert(err.response?.data?.message || "An error occurred during purchase");
     }
   };
 
-  // Function to render star ratings
   const renderRatingStars = (rating: number = 0) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -121,7 +126,7 @@ const ProviderProfile = () => {
         stars.push(<i key={i} className="fas fa-star text-yellow-500"></i>);
       } else if (i === fullStars && hasHalfStar) {
         stars.push(
-          <i key={i} className="fas fa-star-half-alt text-yellow-500"></i>
+          <i key={i} className="fas fa-star-half-alt text-yellow-500"></i>,
         );
       } else {
         stars.push(<i key={i} className="far fa-star text-yellow-500"></i>);
@@ -148,9 +153,9 @@ const ProviderProfile = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-200 mb-6">
+          <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
             <button
-              className={`py-3 px-6 font-medium text-sm ${
+              className={`py-3 px-6 font-medium text-sm whitespace-nowrap ${
                 activeTab === "profile"
                   ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-500 hover:text-gray-700"
@@ -160,7 +165,7 @@ const ProviderProfile = () => {
               Profile Information
             </button>
             <button
-              className={`py-3 px-6 font-medium text-sm ${
+              className={`py-3 px-6 font-medium text-sm whitespace-nowrap ${
                 activeTab === "packages"
                   ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-500 hover:text-gray-700"
@@ -169,21 +174,23 @@ const ProviderProfile = () => {
             >
               Service Packages ({packages.length})
             </button>
-            {/* {userType === "customer" && (
+            {/* New tab for customer contacts - only for providers */}
+            {userType === "provider" && (
               <button
-                className={`py-3 px-6 font-medium text-sm ${
-                  activeTab === "contact"
+                className={`py-3 px-6 font-medium text-sm whitespace-nowrap ${
+                  activeTab === "customerContacts"
                     ? "text-blue-600 border-b-2 border-blue-600"
                     : "text-gray-500 hover:text-gray-700"
                 }`}
-                onClick={() => setActiveTab("contact")}
+                onClick={() => setActiveTab("customerContacts")}
               >
-                Contact
+                <i className="fas fa-address-book mr-2"></i>
+                Customer Contacts ({customerContacts.length})
               </button>
-            )} */}
+            )}
             {userType === "provider" && (
               <button
-                className={`py-3 px-6 font-medium text-sm ${
+                className={`py-3 px-6 font-medium text-sm whitespace-nowrap ${
                   activeTab === "settings"
                     ? "text-blue-600 border-b-2 border-blue-600"
                     : "text-gray-500 hover:text-gray-700"
@@ -206,7 +213,7 @@ const ProviderProfile = () => {
                     }
                     alt={providerData?.providerName}
                     className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
-                      loading="lazy"
+                    loading="lazy"
                   />
                   <div className="absolute -bottom-2 -right-2 bg-blue-100 rounded-full p-2">
                     <i className="fas fa-check-circle text-blue-600 text-xl"></i>
@@ -242,7 +249,7 @@ const ProviderProfile = () => {
                       <span>
                         Member since{" "}
                         {new Date(
-                          providerData?.createdAt || ""
+                          providerData?.createdAt || "",
                         ).toLocaleDateString()}
                       </span>
                     </div>
@@ -330,7 +337,7 @@ const ProviderProfile = () => {
                           >
                             {service}
                           </span>
-                        )
+                        ),
                       )}
                     </div>
                   </div>
@@ -476,7 +483,7 @@ const ProviderProfile = () => {
                                   <i className="fas fa-check-circle text-green-500 mr-2"></i>
                                   <span>{service}</span>
                                 </li>
-                              )
+                              ),
                             )}
                           </ul>
                         </div>
@@ -495,6 +502,128 @@ const ProviderProfile = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Customer Contacts Tab Content - NEW */}
+          {activeTab === "customerContacts" && userType === "provider" && (
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <i className="fas fa-users text-blue-600 mr-3"></i>
+                  Customer Contacts
+                </h2>
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                  Total: {customerContacts.length} contacts
+                </span>
+              </div>
+
+              {customerContacts.length === 0 ? (
+                <div className="text-center py-12">
+                  <i className="fas fa-address-book text-5xl text-gray-300 mb-4"></i>
+                  <h3 className="text-xl font-medium text-gray-700 mb-2">
+                    No customer contacts yet
+                  </h3>
+                  <p className="text-gray-500">
+                    When customers unlock your contact information, their
+                    details will appear here.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Customer Name
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Phone Number
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Services Needed
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Offered Price
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Coins Spent
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {customerContacts.map((contact) => (
+                        <tr
+                          key={contact._id}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                <i className="fas fa-user text-blue-600"></i>
+                              </div>
+                              <div className="font-medium text-gray-900">
+                                {contact.customerName}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center text-gray-600">
+                              <i className="fas fa-phone-alt mr-2 text-green-500"></i>
+                              {contact.customerNumber}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex flex-wrap gap-1">
+                              {contact.servicesNeeded?.map((service, idx) => (
+                                <span
+                                  key={idx}
+                                  className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
+                                >
+                                  {service}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="font-semibold text-gray-900">
+                              ₹{contact.offeredPrice || 0}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <i className="fas fa-coins text-yellow-500 mr-1"></i>
+                              <span>{contact.coinsSpent || 200}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                            {new Date(contact.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                contact.status === "active"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {contact.status === "active"
+                                ? "Active"
+                                : "Completed"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>

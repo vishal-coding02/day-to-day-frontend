@@ -328,8 +328,8 @@ const ProviderHomePage = () => {
             </p>
           </div>
           <button
-            onClick={() => (window.location.href = "/provider-dashboard")}
-            className="px-5 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+            onClick={() => (window.location.href = "/providerDashBoard")}
+            className="px-5 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2 cursor-pointer"
           >
             View All
             <ArrowRight className="w-4 h-4" />

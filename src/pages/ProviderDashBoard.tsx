@@ -24,13 +24,23 @@ const ProviderDashBoard = () => {
   >([]);
 
   useEffect(() => {
-    const currentUserId = localStorage.getItem("userID");
-    const savedContactedRequests = localStorage.getItem(
-      `contactedRequests_${currentUserId}`
-    );
-    if (savedContactedRequests) {
-      setContactedRequests(JSON.parse(savedContactedRequests));
-    }
+    const fetchHistory = async () => {
+      try {
+        const res = await api.get("/providers/customerContact");
+
+        setContactedRequests(
+          res.data.map((item: any) => ({
+            requestId: item.requestID,
+
+            customerContact: item.customerNumber,
+          })),
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchHistory();
   }, []);
 
   useEffect(() => {
@@ -82,25 +92,22 @@ const ProviderDashBoard = () => {
     try {
       const response = await api.post("/providers/customerContact", {
         deductCoins: 50,
-        id: selectedRequest.userID,
+        customerId: selectedRequest.userID,
+        requestId: selectedRequest._id,
       });
       if (response.data.success) {
         console.log("Contact Data", response.data);
         alert(response.data.message);
         setUserCoins(response.data.updatedCoins);
-        const newContactedRequest = {
-          requestId: selectedRequest._id,
-          customerContact: response.data.customerContact,
-        };
-        setContactedRequests((prev) => {
-          const updated = [...prev, newContactedRequest];
-          const currentUserId = localStorage.getItem("userID");
-          localStorage.setItem(
-            `contactedRequests_${currentUserId}`,
-            JSON.stringify(updated)
-          );
-          return updated;
-        });
+        setContactedRequests((prev) => [
+          ...prev,
+
+          {
+            requestId: selectedRequest._id,
+
+            customerContact: response.data.customerContact.customerNumber,
+          },
+        ]);
         setShowContactModal(false);
       } else {
         alert(response.data.message);
@@ -114,7 +121,7 @@ const ProviderDashBoard = () => {
     } catch (error: any) {
       console.error(
         "Error purchasing contact:",
-        error.response?.data?.message || error.message
+        error.response?.data?.message || error.message,
       );
       alert("Error purchasing contact. Please try again.");
     }
@@ -260,7 +267,7 @@ const ProviderDashBoard = () => {
                               >
                                 {service}
                               </span>
-                            )
+                            ),
                           )}
                         </div>
                       </div>
@@ -379,7 +386,7 @@ const ProviderDashBoard = () => {
                           <button
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                contactedRequest.customerContact
+                                contactedRequest.customerContact,
                               );
                               alert("Phone number copied to clipboard!");
                             }}
