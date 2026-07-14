@@ -9,6 +9,7 @@ export interface Package {
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  category: string;
 }
 
 export interface ServicePackage {
@@ -22,4 +23,5 @@ export interface ServicePackage {
   packageStatus: boolean;
   providerName: string;
   userID: string;
+  packageCategory: string;
 }

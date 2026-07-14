@@ -13,33 +13,41 @@ const OTPVerification = lazy(() => import("./pages/Otp.tsx"));
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 const AdminDashboard = lazy(() => import("./admin/AdminDashBoard.tsx"));
 const ReviewProviderProfile = lazy(
-  () => import("./admin/ReviewProviderProfile.tsx")
+  () => import("./admin/ReviewProviderProfile.tsx"),
 );
 const ProviderDashBoard = lazy(() => import("./pages/ProviderDashBoard.tsx"));
 const ProviderReviewPending = lazy(
-  () => import("./components/ProviderReviewPending.tsx")
+  () => import("./components/ProviderReviewPending.tsx"),
 );
 const HomePage = lazy(() => import("./pages/HomePage.tsx"));
 const FindProviders = lazy(() => import("./pages/FindProviders.tsx"));
 const CreateCustomerRequest = lazy(
-  () => import("./pages/CreateCustomerRequest.tsx")
+  () => import("./pages/CreateCustomerRequest.tsx"),
 );
 const ProviderProfile = lazy(() => import("./pages/ProviderProfile.tsx"));
 const ServicePackage = lazy(() => import("./pages/ProviderPackages.tsx"));
 const BuyCoins = lazy(() => import("./pages/BuyCoins.tsx"));
 const CustomerProfile = lazy(() => import("./pages/CustomerProfile.tsx"));
 const RejectedProvider = lazy(
-  () => import("./components/RejectedProvider.tsx")
+  () => import("./components/RejectedProvider.tsx"),
 );
 const PasswordResetSuccess = lazy(
-  () => import("./pages/PasswordResetSuccess.tsx")
+  () => import("./pages/PasswordResetSuccess.tsx"),
 );
 const AboutUs = lazy(() => import("./pages/AboutPage"));
+const AllPackagesPage = lazy(() => import("./pages/AllPackagesPage.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
+const BookPackagePage = lazy(() => import("./pages/BookPackagePage.tsx"));
+const MyBookings = lazy(() => import("./pages/MyBookings.tsx"));
+const PackageBookings = lazy(() => import("./pages/PackageBookings.tsx"))
 const router = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
+  },
+  {
+    path: "/all-packages",
+    element: <AllPackagesPage />,
   },
   {
     path: "/address",
@@ -117,6 +125,18 @@ const router = createBrowserRouter([
     path: "/about",
     element: <AboutUs />,
   },
+  {
+    path: "/book-package/:id",
+    element: <BookPackagePage />,
+  },
+  {
+    path: "/my-bookings",
+    element: <MyBookings />,
+  },
+  {
+    path: "/provider-package-bookings",
+    element: <PackageBookings />,
+  },
 ]);
 
 createRoot(document.getElementById("root")!).render(
@@ -135,5 +155,5 @@ createRoot(document.getElementById("root")!).render(
         <RouterProvider router={router} />
       </Suspense>
     </AuthInitializer>
-  </Provider>
+  </Provider>,
 );

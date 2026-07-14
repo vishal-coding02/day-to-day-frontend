@@ -15,6 +15,7 @@ const ServicePackage = () => {
     servicesIncluded: [],
     deliveryTime: "",
     isActive: true,
+    category: "",
   });
   const [currentService, setCurrentService] = useState("");
   const [timeValue, setTimeValue] = useState("");
@@ -78,6 +79,7 @@ const ServicePackage = () => {
       servicesIncluded: [],
       deliveryTime: "",
       isActive: true,
+      category: "",
     });
     setTimeValue("");
     setTimeUnit("hours");
@@ -93,6 +95,7 @@ const ServicePackage = () => {
       servicesIncluded: [],
       deliveryTime: "",
       isActive: true,
+      category: "",
     });
     setTimeValue("");
     setTimeUnit("hours");
@@ -155,11 +158,11 @@ const ServicePackage = () => {
                 {/* Price */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
-                    Price ($)
+                    Price (₹)
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-3 text-gray-500">
-                      $
+                      ₹
                     </span>
                     <input
                       type="number"
@@ -206,8 +209,31 @@ const ServicePackage = () => {
                   </div>
                 </div>
 
+                {/* Category - NEW FIELD ADDED */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                    Category
+                  </label>
+                  <select
+                    value={newPackage.category}
+                    onChange={(e) =>
+                      setNewPackage({ ...newPackage, category: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="Plumbing">Plumbing</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="Cleaning">Cleaning</option>
+                    <option value="Carpentry">Carpentry</option>
+                    <option value="AC Repair">AC Repair</option>
+                    <option value="Painting">Painting</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
                 {/* Delivery Time */}
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
                     Delivery Time
                   </label>
@@ -264,7 +290,7 @@ const ServicePackage = () => {
                             <i className="fas fa-times"></i>
                           </button>
                         </span>
-                      )
+                      ),
                     )}
                   </div>
                 </div>

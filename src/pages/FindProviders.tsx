@@ -41,7 +41,6 @@ const FindProviders = () => {
 
         if (response.data.data && Array.isArray(response.data.data)) {
           setProviders(response.data.data);
-          console.log(response.data.data);
         } else {
           setProviders([]);
         }
