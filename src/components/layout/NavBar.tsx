@@ -76,10 +76,16 @@ const NavBar = () => {
                       Provider DashBoard
                     </Link>
                     <Link
+                      to="/provider-package-bookings"
+                      className="text-gray-600 px-3 py-2 rounded-md text-sm font-medium hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                    >
+                      Package Bookings
+                    </Link>
+                    <Link
                       to={`/providerProfile/${userID}`}
                       className="text-gray-600 px-3 py-2 rounded-md text-sm font-medium hover:text-gray-900 hover:bg-gray-100 transition-colors"
                     >
-                      View Profile
+                      Profile
                     </Link>
                     <Link
                       to="/packages"
@@ -98,16 +104,28 @@ const NavBar = () => {
                       Find Providers
                     </Link>
                     <Link
+                      to="/all-packages"
+                      className="text-gray-600 px-3 py-2 rounded-md text-sm font-medium hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                    >
+                      All Packages
+                    </Link>
+                    <Link
+                      to="/my-bookings"
+                      className="text-gray-600 px-3 py-2 rounded-md text-sm font-medium hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                    >
+                      My Bookings
+                    </Link>
+                    <Link
                       to="/postRequirement"
                       className="text-gray-600 px-3 py-2 rounded-md text-sm font-medium hover:text-gray-900 hover:bg-gray-100 transition-colors"
                     >
-                      Post Requirement
+                      Post Req
                     </Link>
                     <Link
                       to={`/customerProfile/${userID}`}
                       className="text-gray-600 px-3 py-2 rounded-md text-sm font-medium hover:text-gray-900 hover:bg-gray-100 transition-colors"
                     >
-                      Customer Profile
+                      Profile
                     </Link>
                   </>
                 )}
@@ -156,7 +174,6 @@ const NavBar = () => {
                 aria-expanded="false"
               >
                 <span className="sr-only">Open main menu</span>
-                {/* Hamburger icon */}
                 <svg
                   className={`${isMenuOpen ? "hidden" : "block"} h-6 w-6`}
                   xmlns="http://www.w3.org/2000/svg"
@@ -172,7 +189,6 @@ const NavBar = () => {
                     d="M4 6h16M4 12h16M4 18h16"
                   />
                 </svg>
-                {/* Close icon */}
                 <svg
                   className={`${isMenuOpen ? "block" : "hidden"} h-6 w-6`}
                   xmlns="http://www.w3.org/2000/svg"
@@ -193,7 +209,7 @@ const NavBar = () => {
           </div>
         </div>
 
-        {/* Mobile menu, show/hide based on menu state */}
+        {/* Mobile menu */}
         <div className={`${isMenuOpen ? "block" : "hidden"} md:hidden`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mt-2">
             {/* Coins display in mobile menu */}
@@ -230,21 +246,29 @@ const NavBar = () => {
             >
               Buy Coins
             </Link>
+
             {token && userType === "provider" && (
               <>
                 <Link
                   to="/providerDashBoard"
-                  className="text-gray-900 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
+                  className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Provider DashBoard
+                </Link>
+                <Link
+                  to="/provider-package-bookings"
+                  className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Package Bookings
                 </Link>
                 <Link
                   to={`/providerProfile/${userID}`}
                   className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  View Profile
+                  Profile
                 </Link>
                 <Link
                   to="/packages"
@@ -255,6 +279,7 @@ const NavBar = () => {
                 </Link>
               </>
             )}
+
             {token && userType === "customer" && (
               <>
                 <Link
@@ -265,21 +290,36 @@ const NavBar = () => {
                   Find Providers
                 </Link>
                 <Link
+                  to="/all-packages"
+                  className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  All Packages
+                </Link>
+                <Link
+                  to="/my-bookings"
+                  className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  My Bookings
+                </Link>
+                <Link
                   to="/postRequirement"
                   className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Post Requirement
+                  Post Req
                 </Link>
                 <Link
                   to={`/customerProfile/${userID}`}
                   className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Customer Profile
+                  Profile
                 </Link>
               </>
             )}
+
             {/* Mobile Auth Buttons (visible only when logged out) */}
             {!token && (
               <div className="pt-4 pb-3 border-t border-gray-200">
